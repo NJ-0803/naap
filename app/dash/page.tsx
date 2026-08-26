@@ -12,6 +12,7 @@ import { verifyToken, SESSION_COOKIE } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { currentStreak, standings } from "@/lib/social";
 import { weeklyLines } from "@/lib/rivalry";
+import { createLeagueAction, joinLeagueAction, setUsernameAction } from "./actions";
 import "../globals.css";
 
 export const dynamic = "force-dynamic";
@@ -91,10 +92,10 @@ export default async function Dash() {
   const loggedDays = week.filter((w) => w.logged).length;
 
   const leagues = (await sql`
-    SELECT l.id, l.name FROM leagues l
+    SELECT l.id::int AS id, l.name, l.join_code FROM leagues l
     JOIN league_members m ON m.league_id = l.id
     WHERE m.user_id = ${userId} ORDER BY l.id LIMIT 1
-  `) as { id: number; name: string }[];
+  `) as { id: number; name: string; join_code: string }[];
 
   let table: Awaited<ReturnType<typeof standings>> = [];
   let lines: string[] = [];
@@ -255,10 +256,49 @@ export default async function Dash() {
               ))}
             </>
           ) : (
-            <div className="empty">
-              No league yet — send <b>/league &lt;name&gt;</b> to the bot to start one.
-            </div>
+            <div className="empty">Not in a league yet.</div>
           )}
+
+          {/* ---- invite / join ---- */}
+          <div className="invite">
+            {leagues.length ? (
+              <div className="panel">
+                <div className="badge">invite</div>
+                <div className="k">share this code</div>
+                <div className="code">{leagues[0].join_code}</div>
+                <div className="sub">
+                  Friends open the bot and send <b>/join {leagues[0].join_code}</b> — or paste
+                  the code below on their own dashboard.
+                </div>
+              </div>
+            ) : (
+              <form action={createLeagueAction} className="panel">
+                <div className="badge">start</div>
+                <div className="k">create a league</div>
+                <input name="name" placeholder="Gym Bros" maxLength={40} required />
+                <button type="submit">Create</button>
+                <div className="sub">You&apos;ll get a code to share.</div>
+              </form>
+            )}
+
+            <form action={joinLeagueAction} className="panel">
+              <div className="badge">join</div>
+              <div className="k">have a code?</div>
+              <input name="code" placeholder="ABC123" maxLength={12} required />
+              <button type="submit">Join</button>
+              <div className="sub">Ask a friend for the code on their dashboard.</div>
+            </form>
+
+            {!user.username && (
+              <form action={setUsernameAction} className="panel">
+                <div className="badge">handle</div>
+                <div className="k">claim a name</div>
+                <input name="handle" placeholder="yourname" maxLength={20} required />
+                <button type="submit">Set</button>
+                <div className="sub">This is how you appear on the table.</div>
+              </form>
+            )}
+          </div>
         </section>
 
         <footer>
