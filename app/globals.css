@@ -111,8 +111,9 @@ body {
   font-size: 26px;
   font-weight: 700;
   letter-spacing: 0.22em;
+  color: var(--red);
 }
-.wordmark span { color: var(--red); }
+.wordmark span { color: var(--ink); }
 .wordmark small {
   display: block;
   font-family: var(--body);

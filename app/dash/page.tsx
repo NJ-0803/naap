@@ -117,7 +117,7 @@ export default async function Dash() {
         <header className="mast">
           <div className="wordmark">
             NAAP<span>.</span>
-            <small>नाप — to measure</small>
+            <small>the hall of being fit</small>
           </div>
           <div className="readout">
             <div>

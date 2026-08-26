@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-            <div style={{ fontSize: 15, letterSpacing: 3, color: DIM, textTransform: "uppercase" }}>
+            <div style={{ fontSize: 15, letterSpacing: 3, color: RED, textTransform: "uppercase", fontWeight: 700 }}>
               NAAP
             </div>
             {d.streak ? (

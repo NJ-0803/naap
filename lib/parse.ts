@@ -19,6 +19,8 @@ export type Intent =
   | { kind: "weight"; kg: number }
   | { kind: "undo"; count: number }
   | { kind: "show"; day: string | null }
+  | { kind: "teach"; food: string; stated: string }
+  | { kind: "target"; kcal?: number; protein?: number; carbs?: number; fat?: number; fiber?: number; goal?: string }
   | { kind: "other"; reply: string };
 
 export type RawItem = { name: string; qty: number; unit: string };
@@ -31,6 +33,11 @@ Pick exactly one intent:
 - log_weight: a bare number, or "w 71.4", or "weighed 71.4" — a bodyweight in kg.
 - undo_entry: they want the last entry (or last N) removed.
 - show_day: they want to see a day's summary ("show me sunday", "how did I do").
+- teach_food: they are telling you a food's nutrition ("add beer 220 calories per
+  bottle", "roti is 220 kcal per 100g", "paneer has 18g protein"). Pass their
+  words through verbatim in "stated" — do not convert or round anything.
+- set_targets: they are setting daily goals ("set my target to 1900 calories and
+  130g protein", "goal is cut").
 
 For log_food, list every food mentioned with a quantity and unit:
 - Use grams when they gave grams: {"name":"chicken breast","qty":150,"unit":"g"}
@@ -98,6 +105,42 @@ const TOOLS: Groq.Chat.Completions.ChatCompletionTool[] = [
       parameters: {
         type: "object",
         properties: { count: { type: "integer", default: 1 } },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "teach_food",
+      description: "The user is stating a food's nutrition facts.",
+      parameters: {
+        type: "object",
+        properties: {
+          food: { type: "string", description: "the food name, e.g. 'beer'" },
+          stated: {
+            type: "string",
+            description: "their numbers verbatim, e.g. '220 calories per bottle'",
+          },
+        },
+        required: ["food", "stated"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "set_targets",
+      description: "Set the user's daily macro targets.",
+      parameters: {
+        type: "object",
+        properties: {
+          kcal: { type: "number" },
+          protein: { type: "number" },
+          carbs: { type: "number" },
+          fat: { type: "number" },
+          fiber: { type: "number" },
+          goal: { type: "string", enum: ["cut", "bulk", "recomp", "maintain"] },
+        },
       },
     },
   },
@@ -173,6 +216,21 @@ export async function parseMessage(text: string, localTime: string): Promise<Int
       return { kind: "undo", count: Math.max(1, Number(args.count ?? 1)) };
     case "show_day":
       return { kind: "show", day: typeof args.day === "string" ? args.day : null };
+    case "teach_food": {
+      const food = String(args.food ?? "").trim().toLowerCase();
+      if (!food) return { kind: "other", reply: "Which food?" };
+      return { kind: "teach", food, stated: String(args.stated ?? "").trim() };
+    }
+    case "set_targets": {
+      const pick = (k: string) =>
+        Number.isFinite(Number(args[k])) && Number(args[k]) > 0 ? Number(args[k]) : undefined;
+      return {
+        kind: "target",
+        kcal: pick("kcal"), protein: pick("protein"), carbs: pick("carbs"),
+        fat: pick("fat"), fiber: pick("fiber"),
+        goal: typeof args.goal === "string" ? args.goal : undefined,
+      };
+    }
     default:
       return { kind: "other", reply: "I'm not sure what you meant." };
   }

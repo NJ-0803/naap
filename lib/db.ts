@@ -140,3 +140,14 @@ export async function learnFood(
     ON CONFLICT (owner_user_id, key) DO NOTHING
   `;
 }
+
+export async function setTargets(
+  userId: number,
+  t: { kcal: number; protein: number; carbs: number; fat: number; fiber: number; goal: string }
+): Promise<void> {
+  await sql`
+    UPDATE targets SET kcal = ${t.kcal}, protein = ${t.protein}, carbs = ${t.carbs},
+                       fat = ${t.fat}, fiber = ${t.fiber}, goal = ${t.goal}
+    WHERE user_id = ${userId}
+  `;
+}

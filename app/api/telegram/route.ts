@@ -13,13 +13,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseMessage } from "@/lib/parse";
 import {
   upsertUser, getTargets, loadFoods, claimUpdate, insertEntries,
-  dayTotals, undoEntries, logWeight, sql,
+  dayTotals, undoEntries, logWeight, learnFood, setTargets, sql,
 } from "@/lib/db";
 import {
   currentStreak, setUsername, createLeague, joinLeague, standings, renderStandings,
 } from "@/lib/social";
 import { weeklyLines } from "@/lib/rivalry";
 import { mintToken } from "@/lib/auth";
+import { estimateFood } from "@/lib/learn";
 import {
   findFood, toGrams, macrosFor, implausible, localDay, inferMeal,
   isMassUnit, ZERO, type PricedItem, type Macros,
@@ -200,8 +201,70 @@ async function handle(
       break;
     }
 
+    case "teach": {
+      const fact = await estimateFood(intent.food, intent.stated);
+      if (!fact) {
+        await sendMessage(
+          chatId,
+          `Couldn't turn that into per-100 g numbers. Try e.g. ` +
+            `<code>beer is 43 calories per 100ml</code>.`
+        );
+        break;
+      }
+      await learnFood(user.id, fact.key, fact.per100, fact.portions);
+      const p = fact.per100;
+      const servings = Object.entries(fact.portions)
+        .map(([u, g]) => `1 ${u} = ${g} g → ${Math.round((p.kcal * g) / 100)} kcal`)
+        .slice(0, 3);
+      await sendMessage(
+        chatId,
+        `Learned <b>${escapeHtml(fact.key)}</b>\n<pre>` +
+          escapeHtml(
+            `per 100 g/ml: ${Math.round(p.kcal)} kcal  P${Math.round(p.protein)} ` +
+              `C${Math.round(p.carbs)} F${Math.round(p.fat)}` +
+              (servings.length ? `\n${servings.join("\n")}` : "")
+          ) +
+          `</pre>` +
+          (fact.note ? `\n<i>${escapeHtml(fact.note)}</i>` : "") +
+          `\nIt's yours now — say the amount and I'll log it.`
+      );
+      break;
+    }
+
+    case "target": {
+      const t = await getTargets(user.id);
+      const next = {
+        kcal: intent.kcal ?? t.kcal,
+        protein: intent.protein ?? t.protein,
+        fat: intent.fat ?? t.fat,
+        fiber: intent.fiber ?? t.fiber,
+        goal: intent.goal ?? t.goal,
+        // carbs fill whatever calories protein and fat leave behind
+        carbs: intent.carbs ??
+          Math.round(
+            Math.max(0, (intent.kcal ?? t.kcal) - (intent.protein ?? t.protein) * 4 -
+              (intent.fat ?? t.fat) * 9) / 4
+          ),
+      };
+      await setTargets(user.id, next);
+      await sendMessage(
+        chatId,
+        `<b>Targets updated</b>\n<pre>` +
+          escapeHtml(
+            `kcal     ${Math.round(next.kcal)}\n` +
+              `protein  ${Math.round(next.protein)} g\n` +
+              `carbs    ${Math.round(next.carbs)} g\n` +
+              `fat      ${Math.round(next.fat)} g\n` +
+              `fibre    ${Math.round(next.fiber)} g\n` +
+              `goal     ${next.goal}`
+          ) +
+          `</pre>`
+      );
+      break;
+    }
+
     default:
-      await sendMessage(chatId, escapeHtml(intent.reply));
+      await sendMessage(chatId, escapeHtml((intent as { reply: string }).reply));
   }
 }
 

@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
               {name}
             </div>
           </div>
-          <div style={{ fontSize: 15, letterSpacing: 3, color: DIM, textTransform: "uppercase" }}>
+          <div style={{ fontSize: 15, letterSpacing: 3, color: RED, textTransform: "uppercase", fontWeight: 700 }}>
             NAAP
           </div>
         </div>
