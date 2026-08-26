@@ -1,0 +1,780 @@
+{
+  "_comment": "Macros are per 100 g unless a portion is used. 'portions' maps a unit name to grams. Values from IFCT 2017 / USDA FDC / label averages. Correct any entry once and it stays corrected forever - nutri.py never overwrites existing keys.",
+  "roti": {
+    "per100": {
+      "kcal": 220,
+      "protein": 8.0,
+      "carbs": 46.0,
+      "fat": 2.5,
+      "fiber": 6.0
+    },
+    "portions": {
+      "piece": 45,
+      "small": 35,
+      "large": 60
+    },
+    "aliases": [
+      "chapati",
+      "phulka",
+      "chapatti",
+      "rotis"
+    ]
+  },
+  "paratha": {
+    "per100": {
+      "kcal": 330,
+      "protein": 8.0,
+      "carbs": 45.0,
+      "fat": 13.0,
+      "fiber": 5.0
+    },
+    "portions": {
+      "piece": 80
+    },
+    "aliases": [
+      "parantha",
+      "parauntha"
+    ]
+  },
+  "naan": {
+    "per100": {
+      "kcal": 310,
+      "protein": 9.0,
+      "carbs": 52.0,
+      "fat": 6.5,
+      "fiber": 2.5
+    },
+    "portions": {
+      "piece": 90
+    },
+    "aliases": []
+  },
+  "white rice cooked": {
+    "per100": {
+      "kcal": 130,
+      "protein": 2.7,
+      "carbs": 28.0,
+      "fat": 0.3,
+      "fiber": 0.4
+    },
+    "portions": {
+      "katori": 150,
+      "cup": 158,
+      "bowl": 200,
+      "plate": 250
+    },
+    "aliases": [
+      "rice",
+      "chawal",
+      "steamed rice",
+      "boiled rice"
+    ]
+  },
+  "brown rice cooked": {
+    "per100": {
+      "kcal": 123,
+      "protein": 2.7,
+      "carbs": 26.0,
+      "fat": 1.0,
+      "fiber": 1.6
+    },
+    "portions": {
+      "katori": 150,
+      "cup": 158,
+      "bowl": 200
+    },
+    "aliases": [
+      "brown rice"
+    ]
+  },
+  "dal cooked": {
+    "per100": {
+      "kcal": 116,
+      "protein": 7.0,
+      "carbs": 16.0,
+      "fat": 2.5,
+      "fiber": 4.0
+    },
+    "portions": {
+      "katori": 150,
+      "bowl": 200,
+      "cup": 240
+    },
+    "aliases": [
+      "dal",
+      "daal",
+      "lentils",
+      "toor dal",
+      "moong dal",
+      "masoor dal",
+      "arhar dal"
+    ]
+  },
+  "rajma cooked": {
+    "per100": {
+      "kcal": 140,
+      "protein": 7.5,
+      "carbs": 20.0,
+      "fat": 3.0,
+      "fiber": 6.0
+    },
+    "portions": {
+      "katori": 150,
+      "bowl": 200
+    },
+    "aliases": [
+      "rajma",
+      "kidney beans"
+    ]
+  },
+  "chole cooked": {
+    "per100": {
+      "kcal": 160,
+      "protein": 8.0,
+      "carbs": 22.0,
+      "fat": 4.0,
+      "fiber": 6.5
+    },
+    "portions": {
+      "katori": 150,
+      "bowl": 200
+    },
+    "aliases": [
+      "chole",
+      "chana",
+      "chickpeas",
+      "chana masala",
+      "kabuli chana"
+    ]
+  },
+  "chicken breast cooked": {
+    "per100": {
+      "kcal": 165,
+      "protein": 31.0,
+      "carbs": 0.0,
+      "fat": 3.6,
+      "fiber": 0.0
+    },
+    "portions": {
+      "piece": 120
+    },
+    "aliases": [
+      "chicken breast",
+      "chicken",
+      "grilled chicken"
+    ]
+  },
+  "chicken curry": {
+    "per100": {
+      "kcal": 180,
+      "protein": 15.0,
+      "carbs": 5.0,
+      "fat": 11.0,
+      "fiber": 1.0
+    },
+    "portions": {
+      "katori": 150,
+      "bowl": 200
+    },
+    "aliases": [
+      "chicken gravy",
+      "murgh curry",
+      "butter chicken"
+    ]
+  },
+  "egg whole": {
+    "per100": {
+      "kcal": 143,
+      "protein": 12.6,
+      "carbs": 0.7,
+      "fat": 9.5,
+      "fiber": 0.0
+    },
+    "portions": {
+      "piece": 50,
+      "large": 58
+    },
+    "aliases": [
+      "egg",
+      "eggs",
+      "boiled egg",
+      "anda"
+    ]
+  },
+  "egg white": {
+    "per100": {
+      "kcal": 52,
+      "protein": 10.9,
+      "carbs": 0.7,
+      "fat": 0.2,
+      "fiber": 0.0
+    },
+    "portions": {
+      "piece": 33
+    },
+    "aliases": [
+      "egg whites"
+    ]
+  },
+  "paneer": {
+    "per100": {
+      "kcal": 265,
+      "protein": 18.3,
+      "carbs": 3.4,
+      "fat": 20.8,
+      "fiber": 0.0
+    },
+    "portions": {
+      "cube": 15
+    },
+    "aliases": [
+      "cottage cheese",
+      "paneer cubes"
+    ]
+  },
+  "tofu": {
+    "per100": {
+      "kcal": 76,
+      "protein": 8.0,
+      "carbs": 1.9,
+      "fat": 4.8,
+      "fiber": 0.3
+    },
+    "portions": {},
+    "aliases": []
+  },
+  "curd": {
+    "per100": {
+      "kcal": 61,
+      "protein": 3.5,
+      "carbs": 4.7,
+      "fat": 3.3,
+      "fiber": 0.0
+    },
+    "portions": {
+      "katori": 150,
+      "cup": 245,
+      "bowl": 200
+    },
+    "aliases": [
+      "dahi",
+      "yogurt",
+      "yoghurt"
+    ]
+  },
+  "greek yogurt": {
+    "per100": {
+      "kcal": 59,
+      "protein": 10.0,
+      "carbs": 3.6,
+      "fat": 0.4,
+      "fiber": 0.0
+    },
+    "portions": {
+      "cup": 227,
+      "bowl": 200
+    },
+    "aliases": [
+      "greek curd",
+      "hung curd"
+    ]
+  },
+  "milk toned": {
+    "per100": {
+      "kcal": 58,
+      "protein": 3.1,
+      "carbs": 4.8,
+      "fat": 3.0,
+      "fiber": 0.0
+    },
+    "portions": {
+      "glass": 250,
+      "cup": 240
+    },
+    "aliases": [
+      "milk",
+      "doodh",
+      "toned milk"
+    ]
+  },
+  "milk skimmed": {
+    "per100": {
+      "kcal": 35,
+      "protein": 3.4,
+      "carbs": 5.0,
+      "fat": 0.1,
+      "fiber": 0.0
+    },
+    "portions": {
+      "glass": 250,
+      "cup": 240
+    },
+    "aliases": [
+      "skim milk",
+      "double toned milk"
+    ]
+  },
+  "ghee": {
+    "per100": {
+      "kcal": 900,
+      "protein": 0.0,
+      "carbs": 0.0,
+      "fat": 100.0,
+      "fiber": 0.0
+    },
+    "portions": {
+      "tsp": 5,
+      "tbsp": 14
+    },
+    "aliases": [
+      "clarified butter"
+    ]
+  },
+  "butter": {
+    "per100": {
+      "kcal": 717,
+      "protein": 0.9,
+      "carbs": 0.1,
+      "fat": 81.0,
+      "fiber": 0.0
+    },
+    "portions": {
+      "tsp": 5,
+      "tbsp": 14
+    },
+    "aliases": [
+      "makkhan"
+    ]
+  },
+  "oil": {
+    "per100": {
+      "kcal": 884,
+      "protein": 0.0,
+      "carbs": 0.0,
+      "fat": 100.0,
+      "fiber": 0.0
+    },
+    "portions": {
+      "tsp": 4.5,
+      "tbsp": 13.5
+    },
+    "aliases": [
+      "cooking oil",
+      "mustard oil",
+      "sunflower oil",
+      "olive oil",
+      "refined oil"
+    ]
+  },
+  "whey protein": {
+    "per100": {
+      "kcal": 400,
+      "protein": 78.0,
+      "carbs": 8.0,
+      "fat": 6.0,
+      "fiber": 1.0
+    },
+    "portions": {
+      "scoop": 30,
+      "serving": 30
+    },
+    "aliases": [
+      "protein powder",
+      "whey",
+      "protein shake"
+    ]
+  },
+  "peanut butter": {
+    "per100": {
+      "kcal": 588,
+      "protein": 25.0,
+      "carbs": 20.0,
+      "fat": 50.0,
+      "fiber": 6.0
+    },
+    "portions": {
+      "tbsp": 16,
+      "tsp": 5
+    },
+    "aliases": [
+      "pb"
+    ]
+  },
+  "almonds": {
+    "per100": {
+      "kcal": 579,
+      "protein": 21.2,
+      "carbs": 21.6,
+      "fat": 49.9,
+      "fiber": 12.5
+    },
+    "portions": {
+      "piece": 1.2,
+      "handful": 28
+    },
+    "aliases": [
+      "badam",
+      "almond"
+    ]
+  },
+  "walnuts": {
+    "per100": {
+      "kcal": 654,
+      "protein": 15.2,
+      "carbs": 13.7,
+      "fat": 65.2,
+      "fiber": 6.7
+    },
+    "portions": {
+      "piece": 4,
+      "handful": 28
+    },
+    "aliases": [
+      "akhrot",
+      "walnut"
+    ]
+  },
+  "banana": {
+    "per100": {
+      "kcal": 89,
+      "protein": 1.1,
+      "carbs": 22.8,
+      "fat": 0.3,
+      "fiber": 2.6
+    },
+    "portions": {
+      "piece": 118,
+      "small": 90,
+      "large": 140
+    },
+    "aliases": [
+      "kela"
+    ]
+  },
+  "apple": {
+    "per100": {
+      "kcal": 52,
+      "protein": 0.3,
+      "carbs": 13.8,
+      "fat": 0.2,
+      "fiber": 2.4
+    },
+    "portions": {
+      "piece": 180
+    },
+    "aliases": [
+      "seb"
+    ]
+  },
+  "oats dry": {
+    "per100": {
+      "kcal": 389,
+      "protein": 16.9,
+      "carbs": 66.3,
+      "fat": 6.9,
+      "fiber": 10.6
+    },
+    "portions": {
+      "cup": 80,
+      "bowl": 50,
+      "serving": 40
+    },
+    "aliases": [
+      "oats",
+      "oatmeal",
+      "rolled oats"
+    ]
+  },
+  "poha cooked": {
+    "per100": {
+      "kcal": 130,
+      "protein": 2.5,
+      "carbs": 27.0,
+      "fat": 2.0,
+      "fiber": 1.0
+    },
+    "portions": {
+      "katori": 150,
+      "plate": 200
+    },
+    "aliases": [
+      "poha"
+    ]
+  },
+  "idli": {
+    "per100": {
+      "kcal": 136,
+      "protein": 4.5,
+      "carbs": 28.0,
+      "fat": 0.6,
+      "fiber": 1.2
+    },
+    "portions": {
+      "piece": 40
+    },
+    "aliases": []
+  },
+  "dosa": {
+    "per100": {
+      "kcal": 168,
+      "protein": 3.9,
+      "carbs": 27.0,
+      "fat": 5.0,
+      "fiber": 1.3
+    },
+    "portions": {
+      "piece": 90
+    },
+    "aliases": [
+      "plain dosa",
+      "masala dosa"
+    ]
+  },
+  "upma": {
+    "per100": {
+      "kcal": 150,
+      "protein": 3.5,
+      "carbs": 24.0,
+      "fat": 4.5,
+      "fiber": 1.5
+    },
+    "portions": {
+      "katori": 150,
+      "plate": 200
+    },
+    "aliases": []
+  },
+  "mixed vegetable sabzi": {
+    "per100": {
+      "kcal": 95,
+      "protein": 2.5,
+      "carbs": 9.0,
+      "fat": 5.5,
+      "fiber": 3.0
+    },
+    "portions": {
+      "katori": 150,
+      "bowl": 200
+    },
+    "aliases": [
+      "sabzi",
+      "sabji",
+      "vegetable curry",
+      "mix veg"
+    ]
+  },
+  "palak paneer": {
+    "per100": {
+      "kcal": 180,
+      "protein": 9.0,
+      "carbs": 6.0,
+      "fat": 14.0,
+      "fiber": 2.5
+    },
+    "portions": {
+      "katori": 150,
+      "bowl": 200
+    },
+    "aliases": []
+  },
+  "salad": {
+    "per100": {
+      "kcal": 25,
+      "protein": 1.2,
+      "carbs": 4.5,
+      "fat": 0.2,
+      "fiber": 1.8
+    },
+    "portions": {
+      "bowl": 150,
+      "plate": 200
+    },
+    "aliases": [
+      "green salad",
+      "kachumber"
+    ]
+  },
+  "potato boiled": {
+    "per100": {
+      "kcal": 87,
+      "protein": 1.9,
+      "carbs": 20.1,
+      "fat": 0.1,
+      "fiber": 1.8
+    },
+    "portions": {
+      "piece": 150
+    },
+    "aliases": [
+      "potato",
+      "aloo"
+    ]
+  },
+  "sweet potato boiled": {
+    "per100": {
+      "kcal": 90,
+      "protein": 2.0,
+      "carbs": 20.7,
+      "fat": 0.2,
+      "fiber": 3.3
+    },
+    "portions": {
+      "piece": 150
+    },
+    "aliases": [
+      "sweet potato",
+      "shakarkandi"
+    ]
+  },
+  "bread whole wheat": {
+    "per100": {
+      "kcal": 247,
+      "protein": 13.0,
+      "carbs": 41.0,
+      "fat": 3.4,
+      "fiber": 7.0
+    },
+    "portions": {
+      "slice": 28,
+      "piece": 28
+    },
+    "aliases": [
+      "brown bread",
+      "wheat bread",
+      "bread"
+    ]
+  },
+  "fish rohu": {
+    "per100": {
+      "kcal": 97,
+      "protein": 16.6,
+      "carbs": 0.0,
+      "fat": 2.9,
+      "fiber": 0.0
+    },
+    "portions": {
+      "piece": 100
+    },
+    "aliases": [
+      "fish",
+      "rohu"
+    ]
+  },
+  "salmon cooked": {
+    "per100": {
+      "kcal": 208,
+      "protein": 20.4,
+      "carbs": 0.0,
+      "fat": 13.4,
+      "fiber": 0.0
+    },
+    "portions": {
+      "fillet": 150
+    },
+    "aliases": [
+      "salmon"
+    ]
+  },
+  "mutton cooked": {
+    "per100": {
+      "kcal": 258,
+      "protein": 25.6,
+      "carbs": 0.0,
+      "fat": 16.5,
+      "fiber": 0.0
+    },
+    "portions": {
+      "piece": 100
+    },
+    "aliases": [
+      "mutton",
+      "goat meat",
+      "lamb"
+    ]
+  },
+  "soya chunks dry": {
+    "per100": {
+      "kcal": 345,
+      "protein": 52.0,
+      "carbs": 33.0,
+      "fat": 0.5,
+      "fiber": 13.0
+    },
+    "portions": {
+      "cup": 60,
+      "serving": 30
+    },
+    "aliases": [
+      "soya chunks",
+      "soy chunks",
+      "nutrela"
+    ]
+  },
+  "tea with milk sugar": {
+    "per100": {
+      "kcal": 45,
+      "protein": 1.3,
+      "carbs": 6.5,
+      "fat": 1.4,
+      "fiber": 0.0
+    },
+    "portions": {
+      "cup": 150,
+      "glass": 200
+    },
+    "aliases": [
+      "chai",
+      "tea",
+      "milk tea"
+    ]
+  },
+  "coffee black": {
+    "per100": {
+      "kcal": 1,
+      "protein": 0.1,
+      "carbs": 0.0,
+      "fat": 0.0,
+      "fiber": 0.0
+    },
+    "portions": {
+      "cup": 240,
+      "glass": 200
+    },
+    "aliases": [
+      "black coffee",
+      "americano"
+    ]
+  },
+  "sugar": {
+    "per100": {
+      "kcal": 387,
+      "protein": 0.0,
+      "carbs": 100.0,
+      "fat": 0.0,
+      "fiber": 0.0
+    },
+    "portions": {
+      "tsp": 4,
+      "tbsp": 12
+    },
+    "aliases": [
+      "cheeni"
+    ]
+  },
+  "honey": {
+    "per100": {
+      "kcal": 304,
+      "protein": 0.3,
+      "carbs": 82.4,
+      "fat": 0.0,
+      "fiber": 0.2
+    },
+    "portions": {
+      "tsp": 7,
+      "tbsp": 21
+    },
+    "aliases": [
+      "shahad"
+    ]
+  }
+}
