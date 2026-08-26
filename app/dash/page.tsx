@@ -116,10 +116,10 @@ export default async function Dash() {
 
       <div className="shell">
         <header className="mast">
-          <div className="wordmark">
+          <a className="wordmark home" href="/">
             NAAP<span>.</span>
             <small>the hall of being fit</small>
-          </div>
+          </a>
           <div className="readout">
             <div>
               Streak<b className={streak > 0 ? "hot" : ""}>{streak}d</b>
@@ -130,6 +130,7 @@ export default async function Dash() {
             <div>
               Goal<b>{String(targetsRow.goal ?? "—")}</b>
             </div>
+            <a className="signout" href="/logout">Sign out</a>
           </div>
         </header>
 

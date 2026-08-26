@@ -12,7 +12,28 @@ export async function sendPhoto(chatId: number, url: string, caption?: string): 
   return Boolean(body?.ok);
 }
 
-export async function sendMessage(chatId: number, text: string): Promise<void> {
+/**
+ * The buttons that live above the text field.
+ *
+ * `is_persistent` keeps them on screen instead of collapsing after one use, so
+ * the dashboard is always one tap away — a user should never have to remember
+ * that a command called /web exists.
+ */
+export const KEYBOARD = {
+  keyboard: [
+    [{ text: "📊 Dashboard" }, { text: "🔥 Streak" }],
+    [{ text: "🍽 Today" }, { text: "🏆 Table" }],
+  ],
+  is_persistent: true,
+  resize_keyboard: true,
+  input_field_placeholder: "2 rotis and a katori of dal…",
+};
+
+export async function sendMessage(
+  chatId: number,
+  text: string,
+  withKeyboard = false
+): Promise<void> {
   await fetch(API("sendMessage"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -21,6 +42,7 @@ export async function sendMessage(chatId: number, text: string): Promise<void> {
       text,
       parse_mode: "HTML",
       disable_notification: false,
+      ...(withKeyboard ? { reply_markup: KEYBOARD } : {}),
     }),
   });
 }

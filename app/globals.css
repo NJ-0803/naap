@@ -498,3 +498,26 @@ a { color: var(--red); }
 }
 .invite button:hover { filter: brightness(1.12); }
 .invite .sub { margin-top: 10px; }
+
+/* ---------- dashboard nav ---------- */
+
+.wordmark.home {
+  text-decoration: none;
+  color: var(--red);
+  display: inline-block;
+  transition: opacity .15s;
+}
+.wordmark.home:hover { opacity: .82; }
+
+.signout {
+  align-self: flex-end;
+  font-family: var(--display);
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--faint);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  padding: 7px 12px;
+}
+.signout:hover { color: var(--red); border-color: var(--red); }

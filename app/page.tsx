@@ -1,6 +1,12 @@
+import { cookies } from "next/headers";
 import Demo from "./Demo";
+import { verifyToken, SESSION_COOKIE } from "@/lib/auth";
 import "./globals.css";
 import "./landing.css";
+
+// Reading the session makes this dynamic, which is the point: a signed-in
+// visitor should be offered their dashboard, not asked to open Telegram again.
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Naap — the hall of being fit",
@@ -11,7 +17,10 @@ export const metadata = {
 const BOT = "https://t.me/naap_the_bot";
 const REPO = "https://github.com/NJ-0803/naap";
 
-export default function Home() {
+export default async function Home() {
+  const jar = await cookies();
+  const signedIn = Boolean(verifyToken(jar.get(SESSION_COOKIE)?.value));
+
   return (
     <>
       <div className="frame" />
@@ -27,7 +36,11 @@ export default function Home() {
           </div>
           <nav className="lp-nav">
             <a href={REPO}>Source</a>
-            <a className="cta" href={BOT}>Open in Telegram</a>
+            {signedIn ? (
+              <a className="cta" href="/dash">Your dashboard →</a>
+            ) : (
+              <a className="cta" href={BOT}>Open in Telegram</a>
+            )}
           </nav>
         </header>
 
@@ -47,7 +60,11 @@ export default function Home() {
           <Demo />
 
           <div className="lp-actions">
-            <a className="btn" href={BOT}>Open in Telegram</a>
+            {signedIn ? (
+              <a className="btn" href="/dash">Open your dashboard</a>
+            ) : (
+              <a className="btn" href={BOT}>Open in Telegram</a>
+            )}
             <a className="btn ghost" href={REPO}>Read the source</a>
           </div>
         </section>
@@ -205,7 +222,11 @@ export default function Home() {
           </div>
 
           <div className="lp-actions">
-            <a className="btn" href={BOT}>Start logging</a>
+            {signedIn ? (
+              <a className="btn" href="/dash">Open your dashboard</a>
+            ) : (
+              <a className="btn" href={BOT}>Start logging</a>
+            )}
             <a className="btn ghost" href={REPO}>Deploy your own</a>
           </div>
         </section>

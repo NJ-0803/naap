@@ -84,6 +84,16 @@ async function handle(
     timeZone: user.timezone, hour: "2-digit", minute: "2-digit", hour12: false,
   }).format(now);
 
+  // The persistent keyboard sends plain text, so translate a button label into
+  // the command it represents before routing.
+  const BUTTONS: Record<string, string> = {
+    "📊 Dashboard": "/web",
+    "🔥 Streak": "/streak",
+    "🍽 Today": "/today",
+    "🏆 Table": "/table",
+  };
+  text = BUTTONS[text] ?? text;
+
   // Slash commands are handled directly — no model call, so they answer in
   // milliseconds and cost nothing.
   if (text.startsWith("/")) {
@@ -289,6 +299,8 @@ async function slashCommand(
       await sendMessage(
         chatId,
         `<b>Naap</b> — नाप, to measure.\nJust tell me what you ate — “2 rotis and a katori of dal”.\n\n` +
+          `<b>Your dashboard</b>\nTap <b>📊 Dashboard</b> below (or send /web) for charts, ` +
+          `history and your league. The buttons stay put, so it's always one tap away.\n\n` +
           `<b>Also understands</b>\n` +
           `• “how much protein do I have left”\n• a bare number like <code>71.4</code> (weigh-in)\n` +
           `• “undo”\n• “show me sunday”\n\n` +
@@ -297,7 +309,8 @@ async function slashCommand(
           `/username &lt;handle&gt; — claim a handle\n` +
           `/league &lt;name&gt; — start a friends league\n` +
           `/join &lt;code&gt; — join one\n` +
-          `/table — standings\n/web — open the dashboard`
+          `/table — standings\n/web — open the dashboard`,
+        true
       );
       return true;
 
@@ -307,7 +320,22 @@ async function slashCommand(
       const url = `${base}/link?t=${mintToken(user.id)}`;
       await sendMessage(
         chatId,
-        `Your dashboard — this link works for 10 minutes and signs you in:\n\n${url}`
+        `Your dashboard — this link works for 10 minutes and signs you in:\n\n${url}\n\n` +
+          `<i>Once opened, you stay signed in for 30 days — just visit ` +
+          `naap-zeta.vercel.app.</i>`,
+        true
+      );
+      return true;
+    }
+
+    case "today": {
+      const [totals, targets] = await Promise.all([
+        dayTotals(user.id, day), getTargets(user.id),
+      ]);
+      await sendMessage(
+        chatId,
+        renderDay(totals as unknown as Record<string, number>,
+                  targets as unknown as Record<string, number>)
       );
       return true;
     }
