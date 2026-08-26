@@ -18,11 +18,12 @@ import {
 import {
   currentStreak, setUsername, createLeague, joinLeague, standings, renderStandings,
 } from "@/lib/social";
+import { weeklyLines } from "@/lib/rivalry";
 import {
   findFood, toGrams, macrosFor, implausible, localDay, inferMeal,
   isMassUnit, ZERO, type PricedItem, type Macros,
 } from "@/lib/ledger";
-import { sendMessage, renderDay, escapeHtml } from "@/lib/telegram";
+import { sendMessage, sendPhoto, renderDay, escapeHtml } from "@/lib/telegram";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -223,7 +224,7 @@ async function slashCommand(
     case "help":
       await sendMessage(
         chatId,
-        `<b>NutriLog</b>\nJust tell me what you ate — “2 rotis and a katori of dal”.\n\n` +
+        `<b>Naap</b> — नाप, to measure.\nJust tell me what you ate — “2 rotis and a katori of dal”.\n\n` +
           `<b>Also understands</b>\n` +
           `• “how much protein do I have left”\n• a bare number like <code>71.4</code> (weigh-in)\n` +
           `• “undo”\n• “show me sunday”\n\n` +
@@ -306,7 +307,26 @@ async function slashCommand(
       const since = new Date(`${day}T00:00:00Z`);
       since.setUTCDate(since.getUTCDate() - 6);
       const rows = await standings(leagues[0].id, since.toISOString().slice(0, 10), day);
-      await sendMessage(chatId, renderStandings(escapeHtml(leagues[0].name), rows, 7));
+
+      // The card is the thing people screenshot into the group chat, so try the
+      // image first and fall back to text if Telegram can't fetch it.
+      const payload = rows.map((r) => ({
+        username: r.username, name: r.name, days_logged: Number(r.days_logged),
+        protein_days: Number(r.protein_days), streak: r.streak, score: r.score,
+        me: r.user_id === user.id,
+      }));
+      const base = process.env.PUBLIC_BASE_URL ?? "https://naap-zeta.vercel.app";
+      const cardUrl =
+        `${base}/api/card/league?name=${encodeURIComponent(leagues[0].name)}` +
+        `&days=7&rows=${encodeURIComponent(Buffer.from(JSON.stringify(payload)).toString("base64"))}`;
+
+      const me = rows.find((r) => r.user_id === user.id);
+      const caption = me ? weeklyLines(me, rows, 7).join("\n") : undefined;
+
+      const sent = await sendPhoto(chatId, cardUrl, caption);
+      if (!sent) {
+        await sendMessage(chatId, renderStandings(escapeHtml(leagues[0].name), rows, 7));
+      }
       return true;
     }
 

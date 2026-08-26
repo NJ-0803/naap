@@ -1,6 +1,17 @@
 const API = (method: string) =>
   `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/${method}`;
 
+/** Send a rendered card. Telegram fetches the URL itself, so nothing is uploaded. */
+export async function sendPhoto(chatId: number, url: string, caption?: string): Promise<boolean> {
+  const res = await fetch(API("sendPhoto"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, photo: url, caption, parse_mode: "HTML" }),
+  });
+  const body = await res.json().catch(() => ({ ok: false }));
+  return Boolean(body?.ok);
+}
+
 export async function sendMessage(chatId: number, text: string): Promise<void> {
   await fetch(API("sendMessage"), {
     method: "POST",

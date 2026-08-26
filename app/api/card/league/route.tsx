@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
             </div>
           </div>
           <div style={{ fontSize: 15, letterSpacing: 3, color: DIM, textTransform: "uppercase" }}>
-            NutriLog
+            NAAP
           </div>
         </div>
 

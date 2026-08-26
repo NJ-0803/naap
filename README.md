@@ -1,4 +1,6 @@
-# NutriLog
+# Naap
+
+**naap** — नाप — Hindi for *measure*.
 
 Log meals by text or voice on Telegram. Get macros back in under a second.
 
@@ -38,7 +40,7 @@ The same task, measured:
 | | Tokens per message | Response |
 |---|---|---|
 | Agent-framework version | ~98,000 | 40–80s |
-| **NutriLog** | **~540** | **~800ms** |
+| **Naap** | **~540** | **~800ms** |
 
 The difference isn't the model — it's that this asks one small question instead
 of re-sending 94 KB of tool schemas on every internal step.
@@ -89,8 +91,8 @@ Requires free accounts at [Neon](https://neon.tech), [Groq](https://console.groq
 and a Telegram bot from [@BotFather](https://t.me/BotFather). No cards.
 
 ```bash
-git clone https://github.com/NJ-0803/nutrilog.git
-cd nutrilog
+git clone https://github.com/NJ-0803/naap.git
+cd naap
 npm install
 cp .env.example .env.local     # fill in the three keys
 npm run db:push                # create tables
