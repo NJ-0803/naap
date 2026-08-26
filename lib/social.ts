@@ -44,8 +44,11 @@ export async function setUsername(userId: number, handle: string): Promise<"ok" 
  * morning before the first meal — it only dies after a full day is missed.
  */
 export async function currentStreak(userId: number, today: string): Promise<number> {
+  // day::text matters: without the cast the driver returns a JS Date, and
+  // String(date) is "Wed Aug 26 2026" — sliced to 10 chars it never matches an
+  // ISO key, so every streak silently computed as zero.
   const rows = (await sql`
-    SELECT DISTINCT day FROM entries
+    SELECT DISTINCT day::text AS day FROM entries
     WHERE user_id = ${userId} AND day <= ${today}
     ORDER BY day DESC LIMIT 400
   `) as { day: string }[];
@@ -107,14 +110,18 @@ export async function joinLeague(userId: number, code: string): Promise<{ name: 
  */
 export async function standings(leagueId: number, since: string, today: string): Promise<Standing[]> {
   const rows = (await sql`
-    SELECT u.id                                              AS user_id,
+    -- ::int on every one of these matters. BIGSERIAL and COUNT() come back as
+    -- strings from the driver, and a string id never strict-equals the number
+    -- the caller holds — which silently unhighlighted the viewer's own row and
+    -- suppressed every comparative nudge.
+    SELECT u.id::int                                          AS user_id,
            u.username,
            u.name,
-           COUNT(DISTINCT e.day)                             AS days_logged,
-           COUNT(DISTINCT e.day) FILTER (
-             WHERE e.protein_sum >= t.protein * 0.95)        AS protein_days,
-           COUNT(DISTINCT e.day) FILTER (
-             WHERE abs(e.kcal_sum - t.kcal) <= t.kcal * 0.10) AS on_target_days
+           COUNT(DISTINCT e.day)::int                         AS days_logged,
+           (COUNT(DISTINCT e.day) FILTER (
+             WHERE e.protein_sum >= t.protein * 0.95))::int   AS protein_days,
+           (COUNT(DISTINCT e.day) FILTER (
+             WHERE abs(e.kcal_sum - t.kcal) <= t.kcal * 0.10))::int AS on_target_days
     FROM league_members lm
     JOIN users   u ON u.id = lm.user_id
     JOIN targets t ON t.user_id = u.id

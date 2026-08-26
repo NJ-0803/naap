@@ -19,6 +19,7 @@ import {
   currentStreak, setUsername, createLeague, joinLeague, standings, renderStandings,
 } from "@/lib/social";
 import { weeklyLines } from "@/lib/rivalry";
+import { mintToken } from "@/lib/auth";
 import {
   findFood, toGrams, macrosFor, implausible, localDay, inferMeal,
   isMassUnit, ZERO, type PricedItem, type Macros,
@@ -233,9 +234,20 @@ async function slashCommand(
           `/username &lt;handle&gt; — claim a handle\n` +
           `/league &lt;name&gt; — start a friends league\n` +
           `/join &lt;code&gt; — join one\n` +
-          `/table — standings`
+          `/table — standings\n/web — open the dashboard`
       );
       return true;
+
+    case "web":
+    case "dash": {
+      const base = process.env.PUBLIC_BASE_URL ?? "https://naap-zeta.vercel.app";
+      const url = `${base}/link?t=${mintToken(user.id)}`;
+      await sendMessage(
+        chatId,
+        `Your dashboard — this link works for 10 minutes and signs you in:\n\n${url}`
+      );
+      return true;
+    }
 
     case "streak": {
       const n = await currentStreak(user.id, day);
