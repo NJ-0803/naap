@@ -13,8 +13,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseMessage } from "@/lib/parse";
 import {
   upsertUser, getTargets, loadFoods, claimUpdate, insertEntries,
-  dayTotals, undoEntries, logWeight,
+  dayTotals, undoEntries, logWeight, sql,
 } from "@/lib/db";
+import {
+  currentStreak, setUsername, createLeague, joinLeague, standings, renderStandings,
+} from "@/lib/social";
 import {
   findFood, toGrams, macrosFor, implausible, localDay, inferMeal,
   isMassUnit, ZERO, type PricedItem, type Macros,
@@ -77,6 +80,13 @@ async function handle(
   const localTime = new Intl.DateTimeFormat("en-GB", {
     timeZone: user.timezone, hour: "2-digit", minute: "2-digit", hour12: false,
   }).format(now);
+
+  // Slash commands are handled directly — no model call, so they answer in
+  // milliseconds and cost nothing.
+  if (text.startsWith("/")) {
+    const handled = await slashCommand(chatId, user, text, day);
+    if (handled) return;
+  }
 
   const intent = await parseMessage(text, localTime);
 
@@ -195,4 +205,112 @@ async function handle(
 
 function trim(n: number): string {
   return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)));
+}
+
+/** Returns true when the command was recognised and answered. */
+async function slashCommand(
+  chatId: number,
+  user: { id: number; username?: string | null },
+  text: string,
+  day: string
+): Promise<boolean> {
+  const [rawCmd, ...rest] = text.slice(1).split(/\s+/);
+  const cmd = rawCmd.split("@")[0].toLowerCase();
+  const arg = rest.join(" ").trim();
+
+  switch (cmd) {
+    case "start":
+    case "help":
+      await sendMessage(
+        chatId,
+        `<b>NutriLog</b>\nJust tell me what you ate — “2 rotis and a katori of dal”.\n\n` +
+          `<b>Also understands</b>\n` +
+          `• “how much protein do I have left”\n• a bare number like <code>71.4</code> (weigh-in)\n` +
+          `• “undo”\n• “show me sunday”\n\n` +
+          `<b>Commands</b>\n` +
+          `/streak — your logging streak\n` +
+          `/username &lt;handle&gt; — claim a handle\n` +
+          `/league &lt;name&gt; — start a friends league\n` +
+          `/join &lt;code&gt; — join one\n` +
+          `/table — standings`
+      );
+      return true;
+
+    case "streak": {
+      const n = await currentStreak(user.id, day);
+      await sendMessage(
+        chatId,
+        n === 0
+          ? "No streak yet — log something today to start one. 🔥"
+          : `🔥 <b>${n} day${n === 1 ? "" : "s"}</b> logged in a row.`
+      );
+      return true;
+    }
+
+    case "username": {
+      if (!arg) {
+        await sendMessage(chatId, "Usage: <code>/username yourhandle</code>");
+        return true;
+      }
+      const res = await setUsername(user.id, arg);
+      await sendMessage(
+        chatId,
+        res === "ok"
+          ? `You're <b>@${arg.replace(/^@/, "").toLowerCase()}</b> on the leaderboards.`
+          : res === "taken"
+          ? "That handle's taken — try another."
+          : "Handles are 3–20 characters: letters, numbers, underscores."
+      );
+      return true;
+    }
+
+    case "league": {
+      if (!arg) {
+        await sendMessage(chatId, "Usage: <code>/league Gym Bros</code>");
+        return true;
+      }
+      const league = await createLeague(user.id, arg);
+      await sendMessage(
+        chatId,
+        `Created <b>${escapeHtml(arg)}</b>.\n\nShare this code:\n<code>${league.join_code}</code>\n\n` +
+          `Friends join with <code>/join ${league.join_code}</code>`
+      );
+      return true;
+    }
+
+    case "join": {
+      if (!arg) {
+        await sendMessage(chatId, "Usage: <code>/join ABC123</code>");
+        return true;
+      }
+      const joined = await joinLeague(user.id, arg);
+      await sendMessage(
+        chatId,
+        joined
+          ? `Joined <b>${escapeHtml(joined.name)}</b>. See standings with /table`
+          : "No league with that code."
+      );
+      return true;
+    }
+
+    case "table": {
+      const leagues = (await sql`
+        SELECT l.id, l.name FROM leagues l
+        JOIN league_members m ON m.league_id = l.id
+        WHERE m.user_id = ${user.id} ORDER BY l.id LIMIT 1
+      `) as { id: number; name: string }[];
+      if (!leagues.length) {
+        await sendMessage(chatId, "You're not in a league yet — /league &lt;name&gt; to start one.");
+        return true;
+      }
+      const since = new Date(`${day}T00:00:00Z`);
+      since.setUTCDate(since.getUTCDate() - 6);
+      const rows = await standings(leagues[0].id, since.toISOString().slice(0, 10), day);
+      await sendMessage(chatId, renderStandings(escapeHtml(leagues[0].name), rows, 7));
+      return true;
+    }
+
+    default:
+      return false;
+  }
 }
