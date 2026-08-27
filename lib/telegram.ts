@@ -23,6 +23,7 @@ export const KEYBOARD = {
   keyboard: [
     [{ text: "📊 Dashboard" }, { text: "🔥 Streak" }],
     [{ text: "🍽 Today" }, { text: "🏆 Table" }],
+    [{ text: "🧾 Items" }],
   ],
   is_persistent: true,
   resize_keyboard: true,

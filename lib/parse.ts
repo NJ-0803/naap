@@ -18,6 +18,8 @@ export type Intent =
   | { kind: "status" }
   | { kind: "weight"; kg: number }
   | { kind: "undo"; count: number }
+  | { kind: "items" }
+  | { kind: "delete"; index: number }
   | { kind: "show"; day: string | null }
   | { kind: "teach"; food: string; stated: string }
   | { kind: "target"; kcal?: number; protein?: number; carbs?: number; fat?: number; fiber?: number; goal?: string }
@@ -31,7 +33,13 @@ Pick exactly one intent:
 - log_food: they described food they ate.
 - get_status: they asked how much they have eaten or have left.
 - log_weight: a bare number, or "w 71.4", or "weighed 71.4" — a bodyweight in kg.
-- undo_entry: they want the last entry (or last N) removed.
+- undo_entry: they want the most recently logged entry (or last N) removed.
+- list_items: they want to see each thing they logged today as a numbered list,
+  not just totals ("what did I log", "show my items", "breakdown of today").
+- delete_item: they want one specific numbered entry removed, referencing a
+  number from a list they were already shown ("delete item 2", "remove #3",
+  "delete 2"). Only use this when a number is given — "remove the last thing"
+  is undo_entry, not this.
 - show_day: they want to see a day's summary ("show me sunday", "how did I do").
 - teach_food: they are telling you a food's nutrition ("add beer 220 calories per
   bottle", "roti is 220 kcal per 100g", "paneer has 18g protein"). Pass their
@@ -105,6 +113,28 @@ const TOOLS: Groq.Chat.Completions.ChatCompletionTool[] = [
       parameters: {
         type: "object",
         properties: { count: { type: "integer", default: 1 } },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "list_items",
+      description: "Show today's logged entries individually, numbered.",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_item",
+      description: "Remove one specific numbered entry from today's item list.",
+      parameters: {
+        type: "object",
+        properties: {
+          index: { type: "integer", description: "1-based position in the list, e.g. 2 for 'delete item 2'" },
+        },
+        required: ["index"],
       },
     },
   },
@@ -214,6 +244,15 @@ export async function parseMessage(text: string, localTime: string): Promise<Int
     }
     case "undo_entry":
       return { kind: "undo", count: Math.max(1, Number(args.count ?? 1)) };
+    case "list_items":
+      return { kind: "items" };
+    case "delete_item": {
+      const index = Math.round(Number(args.index));
+      if (!Number.isFinite(index) || index < 1) {
+        return { kind: "other", reply: "Which one? Send /items to see the numbered list, then say e.g. \"delete 2\"." };
+      }
+      return { kind: "delete", index };
+    }
     case "show_day":
       return { kind: "show", day: typeof args.day === "string" ? args.day : null };
     case "teach_food": {

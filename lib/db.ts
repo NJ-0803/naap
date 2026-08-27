@@ -119,6 +119,36 @@ export async function undoEntries(userId: number, count: number) {
   `) as { food: string; qty: number; unit: string; kcal: number }[];
 }
 
+/**
+ * Today's entries, oldest first — the numbering a person sees in /items and
+ * then refers back to with /delete N. Order must match deleteEntryAt exactly,
+ * or "delete 2" would remove the wrong row.
+ */
+export async function listEntries(userId: number, day: string) {
+  return (await sql`
+    SELECT id, meal, food, qty, unit, kcal, protein
+    FROM entries WHERE user_id = ${userId} AND day = ${day}
+    ORDER BY id ASC
+  `) as { id: number; meal: string | null; food: string; qty: number; unit: string; kcal: number; protein: number }[];
+}
+
+/**
+ * Delete one entry by its 1-based position in that same day's list — for
+ * fixing a specific bad entry (a typo, a duplicate, a wrong portion) without
+ * having to undo everything logged after it and re-type it back in.
+ */
+export async function deleteEntryAt(userId: number, day: string, index: number) {
+  const rows = (await sql`
+    WITH target AS (
+      SELECT id FROM entries WHERE user_id = ${userId} AND day = ${day}
+      ORDER BY id ASC OFFSET ${index - 1} LIMIT 1
+    )
+    DELETE FROM entries WHERE id IN (SELECT id FROM target)
+    RETURNING food, qty, unit, kcal
+  `) as { food: string; qty: number; unit: string; kcal: number }[];
+  return rows[0] ?? null;
+}
+
 export async function logWeight(userId: number, day: string, kg: number) {
   await sql`
     INSERT INTO weights (user_id, day, kg) VALUES (${userId}, ${day}, ${kg})

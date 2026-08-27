@@ -13,7 +13,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseMessage } from "@/lib/parse";
 import {
   upsertUser, getTargets, loadFoods, claimUpdate, insertEntries,
-  dayTotals, undoEntries, logWeight, learnFood, setTargets, sql,
+  dayTotals, undoEntries, listEntries, deleteEntryAt, logWeight, learnFood,
+  setTargets, sql,
 } from "@/lib/db";
 import {
   currentStreak, setUsername, createLeague, joinLeague, standings, renderStandings,
@@ -91,6 +92,7 @@ async function handle(
     "🔥 Streak": "/streak",
     "🍽 Today": "/today",
     "🏆 Table": "/table",
+    "🧾 Items": "/items",
   };
   text = BUTTONS[text] ?? text;
 
@@ -197,6 +199,31 @@ async function handle(
       break;
     }
 
+    case "items":
+      await sendItems(chatId, user.id, day);
+      break;
+
+    case "delete": {
+      const removed = await deleteEntryAt(user.id, day, intent.index);
+      if (!removed) {
+        await sendMessage(
+          chatId,
+          `No item #${intent.index} — send /items to see today's numbered list.`
+        );
+        break;
+      }
+      const totals = await dayTotals(user.id, day);
+      const targets = await getTargets(user.id);
+      await sendMessage(
+        chatId,
+        `Deleted <b>${escapeHtml(removed.food)}</b> ${trim(removed.qty)}${removed.unit ?? ""} ` +
+          `(${Math.round(removed.kcal)} kcal)\n` +
+          renderDay(totals as unknown as Record<string, number>,
+                    targets as unknown as Record<string, number>)
+      );
+      break;
+    }
+
     case "show": {
       const target = intent.day ?? day;
       const [totals, targets] = await Promise.all([
@@ -282,6 +309,27 @@ function trim(n: number): string {
   return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)));
 }
 
+/**
+ * The numbered breakdown of a day — what /items shows and what "delete 2"
+ * refers back to. Shared between the slash command and the natural-language
+ * path so both number entries identically.
+ */
+async function sendItems(chatId: number, userId: number, day: string) {
+  const rows = await listEntries(userId, day);
+  if (!rows.length) {
+    await sendMessage(chatId, "Nothing logged today yet.");
+    return;
+  }
+  const lines = rows.map(
+    (r, i) => `${i + 1}. ${r.food} ${trim(r.qty)}${r.unit ?? ""} — ${Math.round(r.kcal)} kcal`
+  );
+  await sendMessage(
+    chatId,
+    `<b>Today's items</b>\n<pre>${escapeHtml(lines.join("\n"))}</pre>\n` +
+      `Wrong one in there? Send <code>/delete 2</code> (or just say “delete 2”) to remove it.`
+  );
+}
+
 /** Returns true when the command was recognised and answered. */
 async function slashCommand(
   chatId: number,
@@ -303,8 +351,13 @@ async function slashCommand(
           `history and your league. The buttons stay put, so it's always one tap away.\n\n` +
           `<b>Also understands</b>\n` +
           `• “how much protein do I have left”\n• a bare number like <code>71.4</code> (weigh-in)\n` +
-          `• “undo”\n• “show me sunday”\n\n` +
+          `• “undo” (removes the last thing logged)\n• “show me sunday”\n\n` +
+          `<b>Logged something wrong?</b>\nSend /items to see today's list, numbered. ` +
+          `Then say <code>delete 2</code> (or /delete 2) to remove just that one — ` +
+          `everything else logged that day stays put.\n\n` +
           `<b>Commands</b>\n` +
+          `/items — today's entries, numbered\n` +
+          `/delete &lt;n&gt; — remove one specific entry\n` +
           `/streak — your logging streak\n` +
           `/username &lt;handle&gt; — claim a handle\n` +
           `/league &lt;name&gt; — start a friends league\n` +
@@ -336,6 +389,35 @@ async function slashCommand(
         chatId,
         renderDay(totals as unknown as Record<string, number>,
                   targets as unknown as Record<string, number>)
+      );
+      return true;
+    }
+
+    case "items":
+    case "list":
+      await sendItems(chatId, user.id, day);
+      return true;
+
+    case "delete": {
+      const n = Math.round(Number(arg));
+      if (!Number.isFinite(n) || n < 1) {
+        await sendMessage(chatId, "Usage: <code>/delete 2</code> — send /items first to see the numbers.");
+        return true;
+      }
+      const removed = await deleteEntryAt(user.id, day, n);
+      if (!removed) {
+        await sendMessage(chatId, `No item #${n} — send /items to see today's numbered list.`);
+        return true;
+      }
+      const [totals, targets] = await Promise.all([
+        dayTotals(user.id, day), getTargets(user.id),
+      ]);
+      await sendMessage(
+        chatId,
+        `Deleted <b>${escapeHtml(removed.food)}</b> ${trim(removed.qty)}${removed.unit ?? ""} ` +
+          `(${Math.round(removed.kcal)} kcal)\n` +
+          renderDay(totals as unknown as Record<string, number>,
+                    targets as unknown as Record<string, number>)
       );
       return true;
     }
