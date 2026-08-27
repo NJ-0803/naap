@@ -69,11 +69,65 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* ---------------- 01 speed ---------------- */}
+        {/* ---------------- 01 getting started ---------------- */}
+        <section>
+          <div className="eyebrow">Start here // two minutes</div>
+          <div className="head">
+            <h2><span className="mark">// 01.</span> Getting Started</h2>
+            <div className="count">no install, no password</div>
+          </div>
+
+          <div className="grid c4">
+            <div className="panel">
+              <div className="badge">01 / telegram</div>
+              <div className="k">open the bot</div>
+              <div className="sub">
+                Tap <b>Open in Telegram</b> above, or search{" "}
+                <code>@naap_the_bot</code> in the Telegram app. Hit{" "}
+                <b>Start</b>.
+              </div>
+            </div>
+            <div className="panel">
+              <div className="badge">02 / log</div>
+              <div className="k">say what you ate</div>
+              <div className="sub">
+                Type it the way you&apos;d say it out loud —
+                &ldquo;2 rotis and a katori of dal.&rdquo; The bot replies
+                with calories and protein in under a second.
+              </div>
+            </div>
+            <div className="panel">
+              <div className="badge">03 / web</div>
+              <div className="k">open your dashboard</div>
+              <div className="sub">
+                Send <code>/web</code> in the chat, or tap the{" "}
+                <b>📊 Dashboard</b> button. It sends a link — tap it once
+                and you&apos;re signed in. No password to set or remember.
+              </div>
+            </div>
+            <div className="panel">
+              <div className="badge">04 / friends</div>
+              <div className="k">bring people in</div>
+              <div className="sub">
+                Send <code>/league Gym Bros</code> to start a group, or{" "}
+                <code>/join CODE</code> to join a friend&apos;s. Everyone
+                runs their own free account.
+              </div>
+            </div>
+          </div>
+
+          <p className="lp-body">
+            That&apos;s the whole setup. Set a calorie or protein goal any
+            time by just telling the bot — e.g. &ldquo;target 1800 kcal 130
+            protein&rdquo; — no settings menu to dig through.
+          </p>
+        </section>
+
+        {/* ---------------- 02 speed ---------------- */}
         <section>
           <div className="eyebrow">Measured // not claimed</div>
           <div className="head">
-            <h2><span className="mark">// 01.</span> The Rebuild</h2>
+            <h2><span className="mark">// 02.</span> The Rebuild</h2>
             <div className="count">same task, both versions</div>
           </div>
 
@@ -112,7 +166,7 @@ export default async function Home() {
         <section>
           <div className="eyebrow">Design // one rule</div>
           <div className="head">
-            <h2><span className="mark">// 02.</span> The Rule</h2>
+            <h2><span className="mark">// 03.</span> The Rule</h2>
             <div className="count">why the numbers hold</div>
           </div>
 
@@ -155,7 +209,7 @@ export default async function Home() {
         <section>
           <div className="eyebrow">Vocabulary // what it speaks</div>
           <div className="head">
-            <h2><span className="mark">// 03.</span> Katori, Not Cups</h2>
+            <h2><span className="mark">// 04.</span> Katori, Not Cups</h2>
             <div className="count">46 foods, seeded</div>
           </div>
 
@@ -178,7 +232,7 @@ export default async function Home() {
         <section>
           <div className="eyebrow">League // consistency, not calories</div>
           <div className="head">
-            <h2><span className="mark">// 04.</span> Bring Friends</h2>
+            <h2><span className="mark">// 05.</span> Bring Friends</h2>
             <div className="count">nobody wins by eating less</div>
           </div>
 
@@ -201,7 +255,7 @@ export default async function Home() {
         <section>
           <div className="eyebrow">Cost // all of it</div>
           <div className="head">
-            <h2><span className="mark">// 05.</span> Free, Actually</h2>
+            <h2><span className="mark">// 06.</span> Free, Actually</h2>
             <div className="count">$0 / month</div>
           </div>
 
