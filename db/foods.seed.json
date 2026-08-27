@@ -1,5 +1,26 @@
 {
   "_comment": "Macros are per 100 g unless a portion is used. 'portions' maps a unit name to grams. Values from IFCT 2017 / USDA FDC / label averages. Correct any entry once and it stays corrected forever - nutri.py never overwrites existing keys.",
+  "kheer": {
+    "per100": {
+      "kcal": 130,
+      "protein": 3.5,
+      "carbs": 21.0,
+      "fat": 4.0,
+      "fiber": 0.2
+    },
+    "portions": {
+      "katori": 150,
+      "bowl": 200,
+      "cup": 200,
+      "glass": 250
+    },
+    "aliases": [
+      "rice kheer",
+      "chawal ki kheer",
+      "rice pudding",
+      "payasam"
+    ]
+  },
   "roti": {
     "per100": {
       "kcal": 220,
