@@ -117,9 +117,13 @@ export async function estimateFood(name: string, stated?: string): Promise<FoodF
     if (Number.isFinite(g) && g > 0 && g < 3000) portions[unit.toLowerCase()] = g;
   }
 
-  const key = String(a.key ?? name).trim().toLowerCase().slice(0, 60);
+  // The model sometimes returns underscored keys ("iced_latte"), but every
+  // lookup (findFood, parsed log items) is space-separated — an underscored
+  // key would silently never match when the food is actually logged.
+  const clean = (s: string) => s.trim().toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ").slice(0, 60);
+  const key = clean(String(a.key ?? name));
   return {
-    key: key || name.trim().toLowerCase(),
+    key: key || clean(name),
     per100,
     portions,
     note: typeof a.note === "string" ? a.note : undefined,
