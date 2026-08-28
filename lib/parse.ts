@@ -20,6 +20,7 @@ export type Intent =
   | { kind: "undo"; count: number }
   | { kind: "items" }
   | { kind: "delete"; index: number }
+  | { kind: "remove"; food: string }
   | { kind: "show"; day: string | null }
   | { kind: "teach"; food: string; stated: string }
   | { kind: "target"; kcal?: number; protein?: number; carbs?: number; fat?: number; fiber?: number; goal?: string }
@@ -31,15 +32,25 @@ const SYSTEM = `You turn a person's message about food into structured data for 
 
 Pick exactly one intent:
 - log_food: they described food they ate.
-- get_status: they asked how much they have eaten or have left.
+- get_status: they asked for their aggregate totals or how much is left against
+  target — one number per macro, nothing itemized ("how am I doing", "calories
+  left", "how much protein do I have").
 - log_weight: a bare number, or "w 71.4", or "weighed 71.4" — a bodyweight in kg.
-- undo_entry: they want the most recently logged entry (or last N) removed.
-- list_items: they want to see each thing they logged today as a numbered list,
-  not just totals ("what did I log", "show my items", "breakdown of today").
+- undo_entry: they want the most recently logged entry (or last N) removed,
+  with no specific food named ("undo", "remove the last thing", "undo last 2").
+- list_items: they want each food they logged today broken out individually,
+  not just the totals — anything asking for a per-item view rather than one
+  summed number ("what did I log", "show my items", "breakdown of today",
+  "bifurcation of my food", "food i logged", "what all did I eat", "split it
+  up", "list my meals"). If the word "food" appears with an ask to see it
+  broken down, split up, or itemized, this is list_items, not get_status.
 - delete_item: they want one specific numbered entry removed, referencing a
-  number from a list they were already shown ("delete item 2", "remove #3",
-  "delete 2"). Only use this when a number is given — "remove the last thing"
-  is undo_entry, not this.
+  position in a list they were already shown ("delete item 2", "remove #3",
+  "delete 2"). Only use this for a bare list position with no food named.
+- remove_food: they name a specific food to remove from today's log ("remove
+  idli", "remove 2 idli", "delete the roti", "undo the dal"). A quantity next
+  to the food name (e.g. "2" in "remove 2 idli") is not a list position —
+  that's still remove_food, not delete_item.
 - show_day: they want to see a day's summary ("show me sunday", "how did I do").
 - teach_food: they are telling you a food's nutrition ("add beer 220 calories per
   bottle", "roti is 220 kcal per 100g", "paneer has 18g protein"). Pass their
@@ -135,6 +146,20 @@ const TOOLS: Groq.Chat.Completions.ChatCompletionTool[] = [
           index: { type: "integer", description: "1-based position in the list, e.g. 2 for 'delete item 2'" },
         },
         required: ["index"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "remove_food",
+      description: "Remove the most recent logged entry for one named food today.",
+      parameters: {
+        type: "object",
+        properties: {
+          food: { type: "string", description: "the food name, e.g. 'idli'" },
+        },
+        required: ["food"],
       },
     },
   },
@@ -252,6 +277,11 @@ export async function parseMessage(text: string, localTime: string): Promise<Int
         return { kind: "other", reply: "Which one? Send /items to see the numbered list, then say e.g. \"delete 2\"." };
       }
       return { kind: "delete", index };
+    }
+    case "remove_food": {
+      const food = String(args.food ?? "").trim().toLowerCase();
+      if (!food) return { kind: "other", reply: "Which food should I remove?" };
+      return { kind: "remove", food };
     }
     case "show_day":
       return { kind: "show", day: typeof args.day === "string" ? args.day : null };

@@ -149,6 +149,26 @@ export async function deleteEntryAt(userId: number, day: string, index: number) 
   return rows[0] ?? null;
 }
 
+/**
+ * Delete the most recent entry today matching a spoken food name — for
+ * "remove idli" / "remove 2 idli", which name a food rather than a list
+ * position (that's deleteEntryAt) or "the last thing" (that's undoEntries).
+ */
+export async function deleteLatestByFood(userId: number, day: string, food: string) {
+  const q = food.trim().toLowerCase();
+  const rows = (await sql`
+    WITH target AS (
+      SELECT id FROM entries
+      WHERE user_id = ${userId} AND day = ${day}
+        AND (lower(food) = ${q} OR lower(food) LIKE ${"%" + q + "%"} OR ${q} LIKE '%' || lower(food) || '%')
+      ORDER BY id DESC LIMIT 1
+    )
+    DELETE FROM entries WHERE id IN (SELECT id FROM target)
+    RETURNING food, qty, unit, kcal
+  `) as { food: string; qty: number; unit: string; kcal: number }[];
+  return rows[0] ?? null;
+}
+
 export async function logWeight(userId: number, day: string, kg: number) {
   await sql`
     INSERT INTO weights (user_id, day, kg) VALUES (${userId}, ${day}, ${kg})
@@ -156,7 +176,14 @@ export async function logWeight(userId: number, day: string, kg: number) {
   `;
 }
 
-/** Teach this user's table a food, after its numbers passed the guard. */
+/**
+ * Teach this user's table a food, after its numbers passed the guard.
+ *
+ * A correction must always win over whatever was there before — that's the
+ * whole point of "a stated number always beats an estimate" (see lib/learn.ts).
+ * DO NOTHING here would silently drop a re-teach of an already-learned food,
+ * leaving stale numbers in place while the bot claims it "learned" the new ones.
+ */
 export async function learnFood(
   userId: number,
   key: string,
@@ -167,7 +194,10 @@ export async function learnFood(
     INSERT INTO foods (owner_user_id, key, kcal, protein, carbs, fat, fiber, portions, learned_at)
     VALUES (${userId}, ${key}, ${per100.kcal}, ${per100.protein}, ${per100.carbs},
             ${per100.fat}, ${per100.fiber}, ${JSON.stringify(portions)}, now())
-    ON CONFLICT (owner_user_id, key) DO NOTHING
+    ON CONFLICT (owner_user_id, key) DO UPDATE
+      SET kcal = EXCLUDED.kcal, protein = EXCLUDED.protein, carbs = EXCLUDED.carbs,
+          fat = EXCLUDED.fat, fiber = EXCLUDED.fiber, portions = EXCLUDED.portions,
+          learned_at = EXCLUDED.learned_at
   `;
 }
 

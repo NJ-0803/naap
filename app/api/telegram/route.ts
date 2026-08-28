@@ -13,8 +13,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseMessage } from "@/lib/parse";
 import {
   upsertUser, getTargets, loadFoods, claimUpdate, insertEntries,
-  dayTotals, undoEntries, listEntries, deleteEntryAt, logWeight, learnFood,
-  setTargets, sql,
+  dayTotals, undoEntries, listEntries, deleteEntryAt, deleteLatestByFood, logWeight,
+  learnFood, setTargets, sql,
 } from "@/lib/db";
 import {
   currentStreak, setUsername, createLeague, joinLeague, standings, renderStandings,
@@ -217,6 +217,27 @@ async function handle(
       await sendMessage(
         chatId,
         `Deleted <b>${escapeHtml(removed.food)}</b> ${trim(removed.qty)}${removed.unit ?? ""} ` +
+          `(${Math.round(removed.kcal)} kcal)\n` +
+          renderDay(totals as unknown as Record<string, number>,
+                    targets as unknown as Record<string, number>)
+      );
+      break;
+    }
+
+    case "remove": {
+      const removed = await deleteLatestByFood(user.id, day, intent.food);
+      if (!removed) {
+        await sendMessage(
+          chatId,
+          `Couldn't find “${escapeHtml(intent.food)}” logged today. Send /items to see what's there.`
+        );
+        break;
+      }
+      const totals = await dayTotals(user.id, day);
+      const targets = await getTargets(user.id);
+      await sendMessage(
+        chatId,
+        `Removed <b>${escapeHtml(removed.food)}</b> ${trim(removed.qty)}${removed.unit ?? ""} ` +
           `(${Math.round(removed.kcal)} kcal)\n` +
           renderDay(totals as unknown as Record<string, number>,
                     targets as unknown as Record<string, number>)
