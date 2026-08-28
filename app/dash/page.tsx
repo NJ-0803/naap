@@ -9,7 +9,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyToken, SESSION_COOKIE } from "@/lib/auth";
-import { sql } from "@/lib/db";
+import { sql, listEntries } from "@/lib/db";
 import { currentStreak, standings } from "@/lib/social";
 import { weeklyLines } from "@/lib/rivalry";
 import { createLeagueAction, joinLeagueAction, setUsernameAction } from "./actions";
@@ -30,6 +30,10 @@ function tone(pct: number, moreIsBetter = false): string {
   if (pct >= 95) return "good";
   if (pct < 55) return "low";
   return "on";
+}
+
+function trim(n: number): string {
+  return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)));
 }
 
 function localDay(tz: string, offsetDays = 0): string {
@@ -69,6 +73,16 @@ export default async function Dash() {
     FROM entries WHERE user_id = ${userId} AND day = ${today}
     GROUP BY meal ORDER BY MIN(ts)
   `) as { meal: string; kcal: number; protein: number }[];
+
+  // Grouped in logged order, same shape Telegram's /items shows — this is the
+  // per-food breakdown the meal totals above don't give you.
+  const entries = await listEntries(userId, today);
+  const itemsByMeal = new Map<string, typeof entries>();
+  for (const e of entries) {
+    const key = e.meal ?? "other";
+    if (!itemsByMeal.has(key)) itemsByMeal.set(key, []);
+    itemsByMeal.get(key)!.push(e);
+  }
 
   const since = localDay(user.timezone, -6);
   const weekRows = (await sql`
@@ -184,6 +198,26 @@ export default async function Dash() {
                   <div className="k">calories</div>
                   <div className="v">{Math.round(m.kcal)}</div>
                   <div className="sub">{Math.round(m.protein)} g protein</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {entries.length > 0 && (
+            <div className="breakdown">
+              {[...itemsByMeal.entries()].map(([meal, list]) => (
+                <div className="meal-group" key={meal}>
+                  <div className="meal-label">{meal}</div>
+                  <div className="items">
+                    {list.map((it) => (
+                      <div className="item" key={it.id}>
+                        <div className="food">{it.food}</div>
+                        <div className="qty">{trim(it.qty)}{it.unit ?? ""}</div>
+                        <div className="kcal">{Math.round(it.kcal)} kcal</div>
+                        <div className="protein">P{Math.round(it.protein)}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>

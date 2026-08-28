@@ -322,6 +322,61 @@ section { padding-top: 54px; }
   padding: 3px 9px;
 }
 
+/* ---------- itemized breakdown ---------- */
+
+.breakdown { margin-top: 28px; }
+.meal-group + .meal-group { margin-top: 20px; }
+.meal-label {
+  font-family: var(--display);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 8px;
+}
+.items { display: grid; gap: 6px; }
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 14px;
+  align-items: baseline;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 10px 16px;
+}
+.item .food {
+  font-family: var(--display);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+.item .qty {
+  font-family: var(--display);
+  font-size: 12.5px;
+  color: var(--faint);
+  text-align: right;
+}
+.item .kcal {
+  font-family: var(--display);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  text-align: right;
+  min-width: 68px;
+}
+.item .protein {
+  font-family: var(--display);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+  text-align: right;
+  min-width: 32px;
+}
+@media (max-width: 560px) {
+  .item { grid-template-columns: 1fr auto; row-gap: 4px; }
+  .item .qty { order: 3; text-align: left; color: var(--faint); }
+  .item .protein { order: 4; text-align: left; }
+}
+
 /* ---------- week bars ---------- */
 
 .week {
