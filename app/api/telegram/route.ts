@@ -394,7 +394,7 @@ async function slashCommand(
       const url = `${base}/link?t=${mintToken(user.id)}`;
       await sendMessage(
         chatId,
-        `Your dashboard — this link works for 10 minutes and signs you in:\n\n${url}\n\n` +
+        `Your dashboard — this link works for 10 minutes and signs you in:\n\n<a href="${url}">${url}</a>\n\n` +
           `<i>Once opened, you stay signed in for 30 days — just visit ` +
           `naap-zeta.vercel.app.</i>`,
         true
