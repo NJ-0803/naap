@@ -38,7 +38,7 @@ export type PricedItem = {
   unit: string;
   grams: number | null;
   macros: Macros;
-  source: "table" | "learned";
+  source: "table" | "learned" | "stated";
 };
 
 export const ZERO: Macros = { kcal: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };

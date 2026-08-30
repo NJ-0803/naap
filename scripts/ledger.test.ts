@@ -36,6 +36,11 @@ check("guard rejects 44,000 kcal", implausible(insane, 200, "tandoori chicken") 
 check("guard allows a real meal", implausible(macrosFor(chicken, 200), 200, "chicken") === null);
 check("guard rejects impossible protein", implausible({ kcal: 100, protein: 300, carbs: 0, fat: 0, fiber: 0 }, 100, "x") !== null);
 
+// log_known: a user-stated total has no grams, so only the absolute-kcal
+// ceiling applies (there's no per-gram figure to sanity-check against)
+check("guard allows a stated total with no grams", implausible({ kcal: 560, protein: 40, carbs: 0, fat: 0, fiber: 0 }, null, "bread + chicken") === null);
+check("guard still rejects an insane stated total", implausible({ kcal: 9000, protein: 0, carbs: 0, fat: 0, fiber: 0 }, null, "lunch") !== null);
+
 // the wrong-date bug: day must come from the clock, in the user's zone
 const day = localDay("Asia/Kolkata");
 check("localDay is ISO", /^\d{4}-\d{2}-\d{2}$/.test(day), day);

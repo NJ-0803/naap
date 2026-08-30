@@ -57,15 +57,20 @@ Plain language, no commands to learn.
 | `71.4` | A bare number is a weigh-in, never food |
 | `undo` | Removes the last entry |
 | `show me sunday` | That day's summary |
+| `bread + chicken = 560 cals` | Already did the maths — logs the total as-is, no lookup |
 
 Portion words are built in: `piece`, `katori`, `bowl`, `cup`, `tbsp`, `tsp`,
 `scoop`, `slice`, `glass`. One roti is 45 g, one katori is 150 g.
 
 ## The food table
 
-46 seeded foods, weighted toward Indian home cooking — roti, dal, rajma, chole,
-paneer, curd, idli, dosa, poha, ghee — where generic nutrition databases are
-weakest.
+75 seeded foods: home cooking weighted toward Indian staples — roti, dal,
+rajma, chole, paneer, curd, idli, dosa, poha, ghee — where generic nutrition
+databases are weakest, plus the packaged and franchise foods people actually
+log day to day — McDonald's, Domino's, KFC, Subway, Starbucks, Maggi, Lay's,
+Kurkure, Parle-G, Bournvita, Amul, Oreo, Dairy Milk, Haldiram's. Every number
+is sourced from an official nutrition page or the package label, never
+estimated.
 
 Foods are **global or per-user**. Correcting "roti" for yourself shadows the
 global row without changing it for anyone else.

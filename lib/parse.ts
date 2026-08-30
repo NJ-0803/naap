@@ -15,6 +15,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export type Intent =
   | { kind: "log"; meal: string | null; items: RawItem[] }
+  | { kind: "logKnown"; meal: string | null; description: string; macros: KnownMacros }
   | { kind: "status" }
   | { kind: "weight"; kg: number }
   | { kind: "undo"; count: number }
@@ -27,11 +28,31 @@ export type Intent =
   | { kind: "other"; reply: string };
 
 export type RawItem = { name: string; qty: number; unit: string };
+export type KnownMacros = {
+  kcal: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  fiber?: number;
+};
 
 const SYSTEM = `You turn a person's message about food into structured data for a macro ledger.
 
 Pick exactly one intent:
-- log_food: they described food they ate.
+- log_food: they described food they ate, for you to price from the food
+  table.
+- log_known: they already worked out the calories (and maybe macros)
+  themselves for the whole meal and just want it stored as-is — an explicit
+  total attached to the meal, not a per-item amount to look up. Signal words:
+  an "=" or "is"/"came to"/"was" immediately before a calorie number for the
+  *whole thing just described*, e.g. "bread + chicken = 560 cals", "my lunch
+  was about 700 kcal", "dinner came to 450 calories, 30g protein". Put
+  whatever they said the meal was in "description" verbatim (e.g. "bread +
+  chicken"); do NOT split it into items or look anything up. If
+  breakfast/lunch/dinner/snack is named — even just as the subject, e.g. "my
+  lunch was..." — set meal to it, same rule as log_food. Only use this
+  when a total number is explicitly given — if they just list foods with
+  quantities for you to price, that is log_food.
 - get_status: they asked for their aggregate totals or how much is left against
   target — one number per macro, nothing itemized ("how am I doing", "calories
   left", "how much protein do I have").
@@ -60,8 +81,14 @@ Pick exactly one intent:
 
 For log_food, list every food mentioned with a quantity and unit:
 - Use grams when they gave grams: {"name":"chicken breast","qty":150,"unit":"g"}
-- Otherwise a portion word: piece, katori, bowl, cup, tbsp, tsp, scoop, slice, glass
+- Otherwise a portion word: piece, katori, bowl, cup, tbsp, tsp, scoop, slice,
+  glass, packet, bar, sub, serving, regular, tall, grande, venti
 - Indian foods are common: roti/chapati, dal, rajma, chole, paneer, curd, idli, dosa, poha, sabzi
+- Franchise/packaged foods are common too: mcdonalds/mcd, dominos, kfc, subway,
+  starbucks, maggi, lays, kurkure, parle-g, bournvita, oreo, dairy milk — use
+  their own size word verbatim as the unit (e.g. "grande cappuccino" ->
+  {"name":"cappuccino","qty":1,"unit":"grande"}, "1 packet maggi" ->
+  {"name":"maggi","qty":1,"unit":"packet"}).
 - 1 roti = 1 piece, 1 katori = 1 katori. Do not convert to grams yourself.
 - Never invent food that was not mentioned. Never estimate calories — that is done in code.
 - Set meal only if stated or obvious; otherwise leave it null.`;
@@ -93,6 +120,36 @@ const TOOLS: Groq.Chat.Completions.ChatCompletionTool[] = [
           },
         },
         required: ["items"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "log_known",
+      description:
+        "Record a meal whose calories (and optionally macros) the user has " +
+        "already calculated themselves. Store their numbers exactly as given " +
+        "— never estimate or look anything up.",
+      parameters: {
+        type: "object",
+        properties: {
+          description: { type: "string", description: "what the meal was, verbatim, e.g. 'bread + chicken'" },
+          meal: {
+            type: ["string", "null"],
+            enum: ["breakfast", "lunch", "dinner", "snack", null],
+            description:
+              "Set this whenever breakfast/lunch/dinner/snack is named anywhere in the " +
+              "message, even just as the subject, e.g. 'my lunch was 700 kcal' -> "
+              + "meal='lunch'. Only null if truly unstated.",
+          },
+          kcal: { type: "number" },
+          protein: { type: "number" },
+          carbs: { type: "number" },
+          fat: { type: "number" },
+          fiber: { type: "number" },
+        },
+        required: ["description", "kcal"],
       },
     },
   },
@@ -257,6 +314,26 @@ export async function parseMessage(text: string, localTime: string): Promise<Int
       if (!clean.length) return { kind: "other", reply: "No food recognised in that." };
       const meal = typeof args.meal === "string" ? args.meal : null;
       return { kind: "log", meal, items: clean };
+    }
+    case "log_known": {
+      const description = String(args.description ?? "").trim();
+      const kcal = Number(args.kcal);
+      if (!description || !Number.isFinite(kcal) || kcal <= 0) {
+        return { kind: "other", reply: "Give me the meal and its calories, e.g. \"bread + chicken = 560 cals\"." };
+      }
+      // Small fast models are unreliable at also filling a second field
+      // (meal) once they've already committed to the tool call — cheaper
+      // and 100% reliable to just look for the word ourselves.
+      const named = /\b(breakfast|lunch|dinner|snack)\b/i.exec(`${description} ${text}`);
+      const meal = typeof args.meal === "string" ? args.meal : named ? named[1].toLowerCase() : null;
+      const pick = (k: string) =>
+        Number.isFinite(Number(args[k])) && Number(args[k]) >= 0 ? Number(args[k]) : undefined;
+      return {
+        kind: "logKnown",
+        meal,
+        description,
+        macros: { kcal, protein: pick("protein"), carbs: pick("carbs"), fat: pick("fat"), fiber: pick("fiber") },
+      };
     }
     case "get_status":
       return { kind: "status" };

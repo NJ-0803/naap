@@ -158,6 +158,42 @@ async function handle(
       break;
     }
 
+    case "logKnown": {
+      const macros: Macros = {
+        kcal: intent.macros.kcal,
+        protein: intent.macros.protein ?? 0,
+        carbs: intent.macros.carbs ?? 0,
+        fat: intent.macros.fat ?? 0,
+        fiber: intent.macros.fiber ?? 0,
+      };
+      const bad = implausible(macros, null, intent.description);
+      if (bad) {
+        await sendMessage(chatId, `⚠ ${escapeHtml(bad)}`);
+        break;
+      }
+
+      const meal = intent.meal ?? inferMeal(user.timezone, now);
+      await insertEntries(user.id, day, meal, [
+        { food: intent.description, qty: 1, unit: "meal", grams: null, macros, source: "stated" },
+      ]);
+
+      const [totals, targets] = await Promise.all([
+        dayTotals(user.id, day), getTargets(user.id),
+      ]);
+      const knownMacros = intent.macros.protein !== undefined || intent.macros.carbs !== undefined ||
+        intent.macros.fat !== undefined || intent.macros.fiber !== undefined;
+      let out =
+        `<b>Logged to ${meal}</b>\n<pre>${escapeHtml(intent.description)} → ${Math.round(macros.kcal)} kcal` +
+        (knownMacros ? `  P${Math.round(macros.protein)}` : "") + `</pre>\n`;
+      out += renderDay(totals as unknown as Record<string, number>,
+                       targets as unknown as Record<string, number>);
+      if (!knownMacros) {
+        out += `\n<i>Only calories were given — protein/carbs/fat logged as 0.</i>`;
+      }
+      await sendMessage(chatId, out);
+      break;
+    }
+
     case "status": {
       const [totals, targets] = await Promise.all([
         dayTotals(user.id, day), getTargets(user.id),
@@ -372,7 +408,8 @@ async function slashCommand(
           `history and your league. The buttons stay put, so it's always one tap away.\n\n` +
           `<b>Also understands</b>\n` +
           `• “how much protein do I have left”\n• a bare number like <code>71.4</code> (weigh-in)\n` +
-          `• “undo” (removes the last thing logged)\n• “show me sunday”\n\n` +
+          `• “undo” (removes the last thing logged)\n• “show me sunday”\n` +
+          `• already did the maths yourself? “bread + chicken = 560 cals” logs it as-is, no lookup\n\n` +
           `<b>Logged something wrong?</b>\nSend /items to see today's list, numbered. ` +
           `Then say <code>delete 2</code> (or /delete 2) to remove just that one — ` +
           `everything else logged that day stays put.\n\n` +

@@ -797,5 +797,479 @@
     "aliases": [
       "shahad"
     ]
+  },
+  "mcdonalds mcaloo tikki": {
+    "per100": {
+      "kcal": 232.55,
+      "protein": 5.82,
+      "carbs": 34.43,
+      "fat": 7.75,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 146
+    },
+    "aliases": [
+      "mcaloo tikki",
+      "aloo tikki burger",
+      "mcaloo tikki burger"
+    ]
+  },
+  "mcdonalds mcchicken": {
+    "per100": {
+      "kcal": 229.35,
+      "protein": 9.05,
+      "carbs": 27.73,
+      "fat": 9.08,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 173
+    },
+    "aliases": [
+      "mcchicken",
+      "mcchicken burger",
+      "mc chicken"
+    ]
+  },
+  "mcdonalds mcspicy paneer": {
+    "per100": {
+      "kcal": 324.88,
+      "protein": 10.2,
+      "carbs": 26.3,
+      "fat": 19.82,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 199
+    },
+    "aliases": [
+      "mcspicy paneer",
+      "mcspicy paneer burger",
+      "mc spicy paneer"
+    ]
+  },
+  "mcdonalds chicken maharaja mac": {
+    "per100": {
+      "kcal": 232.81,
+      "protein": 11.49,
+      "carbs": 18.71,
+      "fat": 12.4,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 296
+    },
+    "aliases": [
+      "chicken maharaja mac",
+      "maharaja mac"
+    ]
+  },
+  "mcdonalds mcveggie": {
+    "per100": {
+      "kcal": 230.88,
+      "protein": 6.1,
+      "carbs": 33.65,
+      "fat": 8.23,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 168
+    },
+    "aliases": [
+      "mcveggie",
+      "mcveggie burger",
+      "mc veggie"
+    ]
+  },
+  "mcdonalds fries medium": {
+    "per100": {
+      "kcal": 279.74,
+      "protein": 4.39,
+      "carbs": 35.17,
+      "fat": 13.49,
+      "fiber": 0
+    },
+    "portions": {
+      "serving": 109
+    },
+    "aliases": [
+      "mcdonalds fries",
+      "mcdonalds french fries",
+      "medium fries"
+    ]
+  },
+  "mcdonalds mcflurry oreo": {
+    "per100": {
+      "kcal": 163.53,
+      "protein": 2.78,
+      "carbs": 25.1,
+      "fat": 5.72,
+      "fiber": 0
+    },
+    "portions": {
+      "regular": 94
+    },
+    "aliases": [
+      "mcflurry",
+      "mcflurry oreo",
+      "oreo mcflurry"
+    ]
+  },
+  "dominos margherita pizza slice": {
+    "per100": {
+      "kcal": 274.29,
+      "protein": 11.43,
+      "carbs": 40.0,
+      "fat": 7.14,
+      "fiber": 1.43
+    },
+    "portions": {
+      "slice": 70
+    },
+    "aliases": [
+      "margherita pizza",
+      "dominos margherita",
+      "margherita slice"
+    ]
+  },
+  "dominos farmhouse pizza slice": {
+    "per100": {
+      "kcal": 264,
+      "protein": 12.0,
+      "carbs": 32.0,
+      "fat": 11.0,
+      "fiber": 0
+    },
+    "portions": {
+      "slice": 120
+    },
+    "aliases": [
+      "farmhouse pizza",
+      "dominos farmhouse"
+    ]
+  },
+  "dominos peppy paneer pizza slice": {
+    "per100": {
+      "kcal": 260,
+      "protein": 12.0,
+      "carbs": 29.0,
+      "fat": 11.0,
+      "fiber": 0
+    },
+    "portions": {
+      "slice": 80
+    },
+    "aliases": [
+      "peppy paneer",
+      "peppy paneer pizza",
+      "dominos peppy paneer"
+    ]
+  },
+  "kfc hot and crispy leg piece": {
+    "per100": {
+      "kcal": 288,
+      "protein": 17,
+      "carbs": 17,
+      "fat": 18,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 100
+    },
+    "aliases": [
+      "kfc chicken leg",
+      "kfc hot and crispy",
+      "kfc leg piece"
+    ]
+  },
+  "kfc hot wings": {
+    "per100": {
+      "kcal": 357.14,
+      "protein": 22.86,
+      "carbs": 22.86,
+      "fat": 17.14,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 35
+    },
+    "aliases": [
+      "kfc wings",
+      "hot wings",
+      "kfc hot wings"
+    ]
+  },
+  "kfc popcorn chicken": {
+    "per100": {
+      "kcal": 340.0,
+      "protein": 23.33,
+      "carbs": 20.0,
+      "fat": 18.89,
+      "fiber": 0
+    },
+    "portions": {
+      "serving": 90
+    },
+    "aliases": [
+      "popcorn chicken",
+      "kfc popcorn"
+    ]
+  },
+  "subway chicken teriyaki sub 6 inch": {
+    "per100": {
+      "kcal": 138.84,
+      "protein": 9.38,
+      "carbs": 22.77,
+      "fat": 1.34,
+      "fiber": 0
+    },
+    "portions": {
+      "sub": 224
+    },
+    "aliases": [
+      "chicken teriyaki sub",
+      "subway chicken teriyaki",
+      "6 inch chicken teriyaki"
+    ]
+  },
+  "subway veggie delite sub 6 inch": {
+    "per100": {
+      "kcal": 147.56,
+      "protein": 5.49,
+      "carbs": 28.05,
+      "fat": 1.83,
+      "fiber": 0
+    },
+    "portions": {
+      "sub": 164
+    },
+    "aliases": [
+      "veggie delite",
+      "subway veggie delite",
+      "6 inch veggie delite"
+    ]
+  },
+  "starbucks cappuccino": {
+    "per100": {
+      "kcal": 29.6,
+      "protein": 1.9,
+      "carbs": 2.96,
+      "fat": 1.06,
+      "fiber": 0
+    },
+    "portions": {
+      "cup": 473,
+      "tall": 354,
+      "grande": 473,
+      "venti": 591
+    },
+    "aliases": [
+      "cappuccino",
+      "starbucks cappuccino"
+    ]
+  },
+  "starbucks caffe latte": {
+    "per100": {
+      "kcal": 40.17,
+      "protein": 2.75,
+      "carbs": 4.02,
+      "fat": 1.48,
+      "fiber": 0
+    },
+    "portions": {
+      "cup": 473,
+      "tall": 354,
+      "grande": 473,
+      "venti": 591
+    },
+    "aliases": [
+      "caffe latte",
+      "cafe latte",
+      "starbucks latte"
+    ]
+  },
+  "maggi 2 minute noodles": {
+    "per100": {
+      "kcal": 384,
+      "protein": 8.2,
+      "carbs": 59.6,
+      "fat": 12.5,
+      "fiber": 0
+    },
+    "portions": {
+      "packet": 75
+    },
+    "aliases": [
+      "maggi",
+      "maggi noodles",
+      "2 minute noodles"
+    ]
+  },
+  "lays potato chips": {
+    "per100": {
+      "kcal": 555,
+      "protein": 6.9,
+      "carbs": 51.4,
+      "fat": 35.7,
+      "fiber": 0
+    },
+    "portions": {
+      "packet": 28
+    },
+    "aliases": [
+      "lays",
+      "lays chips",
+      "lays classic",
+      "lays magic masala",
+      "potato chips"
+    ]
+  },
+  "kurkure masala munch": {
+    "per100": {
+      "kcal": 555,
+      "protein": 6.0,
+      "carbs": 57.3,
+      "fat": 33.6,
+      "fiber": 0
+    },
+    "portions": {
+      "packet": 27
+    },
+    "aliases": [
+      "kurkure",
+      "masala munch"
+    ]
+  },
+  "parle g": {
+    "per100": {
+      "kcal": 451,
+      "protein": 6.5,
+      "carbs": 78.1,
+      "fat": 11.0,
+      "fiber": 0.8
+    },
+    "portions": {
+      "piece": 5.5,
+      "packet": 55
+    },
+    "aliases": [
+      "parle-g",
+      "parle g biscuit",
+      "glucose biscuit"
+    ]
+  },
+  "britannia good day cashew": {
+    "per100": {
+      "kcal": 512,
+      "protein": 7.0,
+      "carbs": 67.0,
+      "fat": 24.0,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 9
+    },
+    "aliases": [
+      "good day",
+      "good day cashew",
+      "good day biscuit"
+    ]
+  },
+  "amul cheese slice": {
+    "per100": {
+      "kcal": 311,
+      "protein": 20.0,
+      "carbs": 1.5,
+      "fat": 25.0,
+      "fiber": 0
+    },
+    "portions": {
+      "slice": 20
+    },
+    "aliases": [
+      "cheese slice",
+      "amul cheese",
+      "processed cheese slice"
+    ]
+  },
+  "bournvita": {
+    "per100": {
+      "kcal": 393,
+      "protein": 7.0,
+      "carbs": 85.0,
+      "fat": 1.8,
+      "fiber": 0
+    },
+    "portions": {
+      "scoop": 10
+    },
+    "aliases": [
+      "cadbury bournvita"
+    ]
+  },
+  "yippee noodles": {
+    "per100": {
+      "kcal": 468,
+      "protein": 9.0,
+      "carbs": 62.6,
+      "fat": 20.1,
+      "fiber": 0
+    },
+    "portions": {
+      "packet": 70
+    },
+    "aliases": [
+      "sunfeast yippee",
+      "yippee magic masala"
+    ]
+  },
+  "cadbury oreo": {
+    "per100": {
+      "kcal": 479.59,
+      "protein": 5.1,
+      "carbs": 69.9,
+      "fat": 19.9,
+      "fiber": 0
+    },
+    "portions": {
+      "piece": 9.8
+    },
+    "aliases": [
+      "oreo",
+      "oreo biscuit"
+    ]
+  },
+  "cadbury dairy milk": {
+    "per100": {
+      "kcal": 524,
+      "protein": 6.8,
+      "carbs": 62.8,
+      "fat": 27.7,
+      "fiber": 0
+    },
+    "portions": {
+      "bar": 55
+    },
+    "aliases": [
+      "dairy milk",
+      "dairy milk chocolate"
+    ]
+  },
+  "haldirams aloo bhujia": {
+    "per100": {
+      "kcal": 520,
+      "protein": 12.0,
+      "carbs": 48.5,
+      "fat": 28.5,
+      "fiber": 0
+    },
+    "portions": {
+      "packet": 150
+    },
+    "aliases": [
+      "aloo bhujia",
+      "bhujia"
+    ]
   }
 }
