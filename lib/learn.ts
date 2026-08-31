@@ -31,12 +31,17 @@ export type FoodFact = {
 const SYSTEM = `You give nutrition facts for foods, PER 100 g (or per 100 ml for drinks).
 
 Rules:
-- Always answer per 100 g/ml, never per serving. If the user states a total for a
-  serving, convert it: 220 kcal per 330 ml bottle is 67 kcal per 100 ml.
+- Give your best-known typical per-100 g/ml values in kcal/protein/carbs/fat/fiber —
+  these are a fallback, used only for whatever the user didn't state a number for.
 - Also give the typical serving sizes in grams, e.g. {"bottle": 330, "glass": 250}
   for a drink, {"piece": 45} for a roti, {"katori": 150} for a curry.
 - Indian foods are common. Use realistic home-cooked values including cooking oil.
-- If the user states a number, use exactly that number. Do not second-guess it.
+- If the user stated any number(s) themselves (e.g. "220 calories per 330 ml bottle"),
+  put those in "stated" EXACTLY as given, plus the serving size in grams/ml they
+  apply to (330 in that example, or 100 if they said "per 100g"). Do NOT divide or
+  convert those numbers yourself — the app does that arithmetic, not you. This
+  matters even when the number looks wrong to you: report what they said, not what
+  you think is correct.
 - Nothing exceeds 9 kcal per gram — that is pure fat.`;
 
 const TOOL: Groq.Chat.Completions.ChatCompletionTool = {
@@ -48,7 +53,7 @@ const TOOL: Groq.Chat.Completions.ChatCompletionTool = {
       type: "object",
       properties: {
         key: { type: "string", description: "short lowercase name, e.g. 'beer'" },
-        kcal: { type: "number", description: "per 100 g/ml" },
+        kcal: { type: "number", description: "per 100 g/ml, your best-known typical value" },
         protein: { type: "number" },
         carbs: { type: "number" },
         fat: { type: "number" },
@@ -57,6 +62,20 @@ const TOOL: Groq.Chat.Completions.ChatCompletionTool = {
           type: "object",
           description: 'serving name to grams, e.g. {"bottle":330,"glass":250}',
           additionalProperties: { type: "number" },
+        },
+        stated: {
+          type: "object",
+          description:
+            "Numbers the USER explicitly gave, unconverted, plus the serving size " +
+            "(grams/ml) they apply to. Omit entirely if the user gave no numbers.",
+          properties: {
+            serving_g: { type: "number", description: "e.g. 330 for 'per 330ml bottle', 100 for 'per 100g'" },
+            kcal: { type: "number" },
+            protein: { type: "number" },
+            carbs: { type: "number" },
+            fat: { type: "number" },
+            fiber: { type: "number" },
+          },
         },
         note: { type: "string", description: "one short line on what was assumed" },
       },
@@ -67,11 +86,18 @@ const TOOL: Groq.Chat.Completions.ChatCompletionTool = {
 
 /**
  * `stated` carries anything the user asserted ("220 calories per bottle") so the
- * model converts rather than invents.
+ * model reports it back rather than inventing — the per-100 conversion for
+ * whatever the user stated happens below, in code, not in the model's answer.
+ * Letting the model do that division was the bug: on an implausible-looking
+ * stated number (e.g. "dragon fruit is 900 calories per 100g"), it would
+ * sometimes quietly substitute its own more "reasonable" estimate instead of
+ * the number it was just told to use verbatim. Splitting "what did they say"
+ * (reliable) from "convert it" (deterministic arithmetic) removes the model's
+ * opening to second-guess a correction it was explicitly told not to.
  */
 export async function estimateFood(name: string, stated?: string): Promise<FoodFact | null> {
   const ask = stated
-    ? `Food: ${name}. The user states: ${stated}. Convert to per-100 values.`
+    ? `Food: ${name}. The user states: ${stated}.`
     : `Food: ${name}. Give typical values.`;
 
   const res = await groq.chat.completions.create({
@@ -103,8 +129,23 @@ export async function estimateFood(name: string, stated?: string): Promise<FoodF
     fat: num(a.fat), fiber: num(a.fiber),
   };
 
+  // Whatever the user explicitly stated overrides the model's own per-100
+  // estimate for that field — converted here, deterministically, instead of
+  // trusting the model to have done the division correctly (or at all).
+  const s = (a.stated ?? {}) as Record<string, unknown>;
+  const servingG = num(s.serving_g);
+  if (servingG > 0) {
+    const factor = 100 / servingG;
+    for (const k of ["kcal", "protein", "carbs", "fat", "fiber"] as const) {
+      if (s[k] !== undefined && Number.isFinite(Number(s[k]))) {
+        per100[k] = Math.round(Number(s[k]) * factor * 100) / 100;
+      }
+    }
+  }
+
   // Same ceiling the ledger enforces: nothing edible exceeds ~9 kcal/g, so a
-  // per-100 figure above 900 means the model answered per serving.
+  // per-100 figure above 900 means the model (or a stated conversion) landed
+  // on a per-serving number instead of per-100.
   if (!(per100.kcal > 0) || per100.kcal > 900) return null;
   for (const k of ["protein", "carbs", "fat", "fiber"] as const) {
     if (per100[k] < 0 || per100[k] > 100) return null;
