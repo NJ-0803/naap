@@ -22,6 +22,7 @@ import {
 import { weeklyLines } from "@/lib/rivalry";
 import { mintToken } from "@/lib/auth";
 import { estimateFood } from "@/lib/learn";
+import { verifyKcal } from "@/lib/verify";
 import {
   findFood, toGrams, macrosFor, implausible, localDay, inferMeal,
   isMassUnit, ZERO, type PricedItem, type Macros,
@@ -65,10 +66,20 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await handle(chatId, from, text);
+    // A hard ceiling under maxDuration. The update_id is already claimed at
+    // this point (that's what makes Telegram's retries safe to ignore), so
+    // any path that runs long enough to hit the platform's own timeout gets
+    // killed mid-flight with no reply ever sent — and no way for the user to
+    // get a second attempt, since their retry is now a rejected duplicate.
+    // Racing a shorter timeout here means we always reply first, even if
+    // `handle` is still running in the background when we do.
+    await Promise.race([
+      handle(chatId, from, text),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("handler timeout")), 20_000)),
+    ]);
   } catch (err) {
     console.error("handler failed", err);
-    await sendMessage(chatId, "Something broke on my side. Try again in a moment.");
+    await sendMessage(chatId, "That took too long on my side — try again in a moment.");
   }
   return ok();
 }
@@ -318,7 +329,13 @@ async function handle(
         );
         break;
       }
-      await learnFood(user.id, fact.key, fact.per100, fact.portions);
+      // Written and cross-checked in parallel — the verification lookup
+      // never blocks or changes what gets saved, it only adds a note to the
+      // reply (see lib/verify.ts).
+      const [, warning] = await Promise.all([
+        learnFood(user.id, fact.key, fact.per100, fact.portions),
+        verifyKcal(fact.key, fact.per100.kcal),
+      ]);
       const p = fact.per100;
       const servings = Object.entries(fact.portions)
         .map(([u, g]) => `1 ${u} = ${g} g → ${Math.round((p.kcal * g) / 100)} kcal`)
@@ -333,6 +350,7 @@ async function handle(
           ) +
           `</pre>` +
           (fact.note ? `\n<i>${escapeHtml(fact.note)}</i>` : "") +
+          (warning ? `\n${escapeHtml(warning)}` : "") +
           `\nIt's yours now — say the amount and I'll log it.`
       );
       break;

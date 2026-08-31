@@ -11,7 +11,22 @@ import Groq from "groq-sdk";
 
 export const PARSE_MODEL = process.env.GROQ_MODEL ?? "qwen/qwen3.8-27b";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+/**
+ * The SDK default (2 retries, honoring Groq's `retry-after` header) sounds
+ * reasonable but isn't for a webhook: a single 429 can make one message eat
+ * 15-40s waiting for capacity that may not even free up. Worse, that request
+ * can then blow past route.ts's function timeout, which gets killed by the
+ * platform mid-retry — after the update_id is already claimed, so Telegram's
+ * own retry is silently dropped and the message is gone for good. Failing
+ * fast here means the request finishes well inside that budget either way,
+ * so the caller's try/catch always gets to run and actually reply.
+ *
+ * maxRetries: 0 — a 429 itself comes back instantly; the slow part was
+ * always the SDK's mandatory sleep before retrying, which honors Groq's own
+ * `retry-after` header (15s in testing) regardless of the timeout below. One
+ * retry with that header is enough on its own to blow the whole budget.
+ */
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY, maxRetries: 0, timeout: 8_000 });
 
 export type Intent =
   | { kind: "log"; meal: string | null; items: RawItem[] }
@@ -292,16 +307,31 @@ const TOOLS: Groq.Chat.Completions.ChatCompletionTool[] = [
 ];
 
 export async function parseMessage(text: string, localTime: string): Promise<Intent> {
-  const res = await groq.chat.completions.create({
-    model: PARSE_MODEL,
-    max_tokens: 600,
-    temperature: 0,
-    messages: [
-      { role: "system", content: SYSTEM },
-      { role: "user", content: `[local time ${localTime}] ${text}` },
-    ],
-    tools: TOOLS,
-  });
+  let res;
+  try {
+    res = await groq.chat.completions.create({
+      model: PARSE_MODEL,
+      // A tool call's actual output is small (a handful of fields); Groq's
+      // TPM accounting reserves the full max_tokens against the rate limit
+      // regardless of what's used, so keeping this tight buys real headroom
+      // under a shared quota instead of just sitting there unused.
+      max_tokens: 350,
+      temperature: 0,
+      messages: [
+        { role: "system", content: SYSTEM },
+        { role: "user", content: `[local time ${localTime}] ${text}` },
+      ],
+      tools: TOOLS,
+    });
+  } catch (err) {
+    const rateLimited = err instanceof Groq.APIError && err.status === 429;
+    return {
+      kind: "other",
+      reply: rateLimited
+        ? "Getting a lot of requests right now — try again in a few seconds."
+        : "Couldn't reach the parser just now — try again in a moment.",
+    };
+  }
 
   const msg = res.choices[0]?.message;
   const call = msg?.tool_calls?.[0];
