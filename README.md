@@ -64,12 +64,14 @@ Portion words are built in: `piece`, `katori`, `bowl`, `cup`, `tbsp`, `tsp`,
 
 ## The food table
 
-75 seeded foods: home cooking weighted toward Indian staples — roti, dal,
+108 seeded foods: home cooking weighted toward Indian staples — roti, dal,
 rajma, chole, paneer, curd, idli, dosa, poha, ghee — where generic nutrition
-databases are weakest, plus the packaged and franchise foods people actually
-log day to day — McDonald's, Domino's, KFC, Subway, Starbucks, Maggi, Lay's,
-Kurkure, Parle-G, Bournvita, Amul, Oreo, Dairy Milk, Haldiram's. Every number
-is sourced from an official nutrition page or the package label, never
+databases are weakest, the packaged and franchise foods people actually log
+day to day — McDonald's, Domino's, KFC, Subway, Starbucks, Maggi, Lay's,
+Kurkure, Parle-G, Bournvita, Amul, Oreo, Dairy Milk, Haldiram's — and a full
+fruit, dried-fruit, and nut table — mango, guava, pomegranate, dates, cashews,
+pistachios, walnuts, and more. Every number is sourced from an official
+nutrition page, package label, or standard food-composition data, never
 estimated.
 
 Foods are **global or per-user**. Correcting "roti" for yourself shadows the

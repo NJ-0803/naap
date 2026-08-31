@@ -1271,5 +1271,556 @@
       "aloo bhujia",
       "bhujia"
     ]
+  },
+  "orange": {
+    "per100": {
+      "kcal": 47,
+      "protein": 0.9,
+      "carbs": 11.8,
+      "fat": 0.1,
+      "fiber": 2.4
+    },
+    "portions": {
+      "piece": 131
+    },
+    "aliases": [
+      "santra",
+      "orange fruit"
+    ]
+  },
+  "mango": {
+    "per100": {
+      "kcal": 60,
+      "protein": 0.8,
+      "carbs": 15.0,
+      "fat": 0.4,
+      "fiber": 1.6
+    },
+    "portions": {
+      "piece": 200,
+      "cup": 165
+    },
+    "aliases": [
+      "aam"
+    ]
+  },
+  "papaya": {
+    "per100": {
+      "kcal": 43,
+      "protein": 0.5,
+      "carbs": 10.8,
+      "fat": 0.3,
+      "fiber": 1.7
+    },
+    "portions": {
+      "cup": 145,
+      "bowl": 150,
+      "katori": 150
+    },
+    "aliases": [
+      "papita"
+    ]
+  },
+  "guava": {
+    "per100": {
+      "kcal": 68,
+      "protein": 2.6,
+      "carbs": 14.3,
+      "fat": 1.0,
+      "fiber": 5.4
+    },
+    "portions": {
+      "piece": 90
+    },
+    "aliases": [
+      "amrud",
+      "peru"
+    ]
+  },
+  "pomegranate": {
+    "per100": {
+      "kcal": 83,
+      "protein": 1.7,
+      "carbs": 18.7,
+      "fat": 1.2,
+      "fiber": 4.0
+    },
+    "portions": {
+      "cup": 174,
+      "bowl": 150,
+      "katori": 150
+    },
+    "aliases": [
+      "anar"
+    ]
+  },
+  "grapes": {
+    "per100": {
+      "kcal": 69,
+      "protein": 0.7,
+      "carbs": 18.1,
+      "fat": 0.2,
+      "fiber": 0.9
+    },
+    "portions": {
+      "cup": 151,
+      "bowl": 150
+    },
+    "aliases": [
+      "angoor",
+      "grape"
+    ]
+  },
+  "watermelon": {
+    "per100": {
+      "kcal": 30,
+      "protein": 0.6,
+      "carbs": 7.6,
+      "fat": 0.2,
+      "fiber": 0.4
+    },
+    "portions": {
+      "cup": 152,
+      "slice": 280
+    },
+    "aliases": [
+      "tarbooj",
+      "tarbuj"
+    ]
+  },
+  "pineapple": {
+    "per100": {
+      "kcal": 50,
+      "protein": 0.5,
+      "carbs": 13.1,
+      "fat": 0.1,
+      "fiber": 1.4
+    },
+    "portions": {
+      "cup": 165,
+      "slice": 84
+    },
+    "aliases": [
+      "ananas"
+    ]
+  },
+  "pear": {
+    "per100": {
+      "kcal": 57,
+      "protein": 0.4,
+      "carbs": 15.2,
+      "fat": 0.1,
+      "fiber": 3.1
+    },
+    "portions": {
+      "piece": 178
+    },
+    "aliases": [
+      "nashpati"
+    ]
+  },
+  "chikoo": {
+    "per100": {
+      "kcal": 83,
+      "protein": 0.4,
+      "carbs": 19.9,
+      "fat": 1.1,
+      "fiber": 5.3
+    },
+    "portions": {
+      "piece": 100
+    },
+    "aliases": [
+      "sapota",
+      "sapodilla"
+    ]
+  },
+  "litchi": {
+    "per100": {
+      "kcal": 66,
+      "protein": 0.8,
+      "carbs": 16.5,
+      "fat": 0.4,
+      "fiber": 1.3
+    },
+    "portions": {
+      "piece": 10,
+      "handful": 100
+    },
+    "aliases": [
+      "lychee"
+    ]
+  },
+  "kiwi": {
+    "per100": {
+      "kcal": 61,
+      "protein": 1.1,
+      "carbs": 14.7,
+      "fat": 0.5,
+      "fiber": 3.0
+    },
+    "portions": {
+      "piece": 76
+    },
+    "aliases": [
+      "kiwi fruit"
+    ]
+  },
+  "strawberry": {
+    "per100": {
+      "kcal": 32,
+      "protein": 0.7,
+      "carbs": 7.7,
+      "fat": 0.3,
+      "fiber": 2.0
+    },
+    "portions": {
+      "cup": 152,
+      "piece": 12
+    },
+    "aliases": [
+      "strawberries"
+    ]
+  },
+  "muskmelon": {
+    "per100": {
+      "kcal": 34,
+      "protein": 0.8,
+      "carbs": 8.2,
+      "fat": 0.2,
+      "fiber": 0.9
+    },
+    "portions": {
+      "cup": 177,
+      "bowl": 150
+    },
+    "aliases": [
+      "kharbuja",
+      "cantaloupe"
+    ]
+  },
+  "peach": {
+    "per100": {
+      "kcal": 39,
+      "protein": 0.9,
+      "carbs": 9.5,
+      "fat": 0.3,
+      "fiber": 1.5
+    },
+    "portions": {
+      "piece": 150
+    },
+    "aliases": [
+      "aadu"
+    ]
+  },
+  "plum": {
+    "per100": {
+      "kcal": 46,
+      "protein": 0.7,
+      "carbs": 11.4,
+      "fat": 0.3,
+      "fiber": 1.4
+    },
+    "portions": {
+      "piece": 66
+    },
+    "aliases": [
+      "aloo bukhara"
+    ]
+  },
+  "custard apple": {
+    "per100": {
+      "kcal": 94,
+      "protein": 2.1,
+      "carbs": 23.6,
+      "fat": 0.3,
+      "fiber": 4.4
+    },
+    "portions": {
+      "piece": 120
+    },
+    "aliases": [
+      "sitaphal",
+      "sugar apple"
+    ]
+  },
+  "jackfruit": {
+    "per100": {
+      "kcal": 95,
+      "protein": 1.7,
+      "carbs": 23.2,
+      "fat": 0.6,
+      "fiber": 1.5
+    },
+    "portions": {
+      "cup": 165
+    },
+    "aliases": [
+      "kathal"
+    ]
+  },
+  "fig fresh": {
+    "per100": {
+      "kcal": 74,
+      "protein": 0.8,
+      "carbs": 19.2,
+      "fat": 0.3,
+      "fiber": 2.9
+    },
+    "portions": {
+      "piece": 50
+    },
+    "aliases": [
+      "fresh anjeer",
+      "fresh fig"
+    ]
+  },
+  "dates dried": {
+    "per100": {
+      "kcal": 277,
+      "protein": 1.8,
+      "carbs": 75.0,
+      "fat": 0.2,
+      "fiber": 6.7
+    },
+    "portions": {
+      "piece": 24,
+      "handful": 40
+    },
+    "aliases": [
+      "dates",
+      "khajur",
+      "date",
+      "medjool dates",
+      "dry dates"
+    ]
+  },
+  "cashews": {
+    "per100": {
+      "kcal": 553,
+      "protein": 18.2,
+      "carbs": 30.2,
+      "fat": 43.9,
+      "fiber": 3.3
+    },
+    "portions": {
+      "piece": 1.5,
+      "handful": 28,
+      "tbsp": 8.5
+    },
+    "aliases": [
+      "cashew",
+      "kaju",
+      "cashew nuts"
+    ]
+  },
+  "pistachios": {
+    "per100": {
+      "kcal": 560,
+      "protein": 20.3,
+      "carbs": 27.2,
+      "fat": 45.3,
+      "fiber": 10.3
+    },
+    "portions": {
+      "piece": 0.7,
+      "handful": 28
+    },
+    "aliases": [
+      "pistachio",
+      "pista",
+      "pista nuts"
+    ]
+  },
+  "peanuts": {
+    "per100": {
+      "kcal": 567,
+      "protein": 25.8,
+      "carbs": 16.1,
+      "fat": 49.2,
+      "fiber": 8.5
+    },
+    "portions": {
+      "handful": 28,
+      "tbsp": 9
+    },
+    "aliases": [
+      "peanut",
+      "moongfali",
+      "groundnuts",
+      "groundnut"
+    ]
+  },
+  "pine nuts": {
+    "per100": {
+      "kcal": 673,
+      "protein": 13.7,
+      "carbs": 13.1,
+      "fat": 68.4,
+      "fiber": 3.7
+    },
+    "portions": {
+      "tbsp": 9.3,
+      "handful": 28
+    },
+    "aliases": [
+      "chilgoza",
+      "pine nut"
+    ]
+  },
+  "hazelnuts": {
+    "per100": {
+      "kcal": 628,
+      "protein": 15.0,
+      "carbs": 16.7,
+      "fat": 60.8,
+      "fiber": 9.7
+    },
+    "portions": {
+      "piece": 1.3,
+      "handful": 28
+    },
+    "aliases": [
+      "hazelnut"
+    ]
+  },
+  "macadamia": {
+    "per100": {
+      "kcal": 718,
+      "protein": 7.9,
+      "carbs": 13.8,
+      "fat": 75.8,
+      "fiber": 8.6
+    },
+    "portions": {
+      "piece": 2,
+      "handful": 28
+    },
+    "aliases": [
+      "macadamia nuts",
+      "macadamia nut"
+    ]
+  },
+  "brazil nuts": {
+    "per100": {
+      "kcal": 659,
+      "protein": 14.3,
+      "carbs": 11.7,
+      "fat": 67.1,
+      "fiber": 7.5
+    },
+    "portions": {
+      "piece": 5,
+      "handful": 28
+    },
+    "aliases": [
+      "brazil nut"
+    ]
+  },
+  "pecans": {
+    "per100": {
+      "kcal": 691,
+      "protein": 9.2,
+      "carbs": 13.9,
+      "fat": 72.0,
+      "fiber": 9.6
+    },
+    "portions": {
+      "piece": 2,
+      "handful": 28
+    },
+    "aliases": [
+      "pecan",
+      "pecan nuts"
+    ]
+  },
+  "coconut fresh": {
+    "per100": {
+      "kcal": 354,
+      "protein": 3.3,
+      "carbs": 15.2,
+      "fat": 33.5,
+      "fiber": 9.0
+    },
+    "portions": {
+      "cup": 80,
+      "tbsp": 5
+    },
+    "aliases": [
+      "nariyal",
+      "fresh coconut",
+      "coconut"
+    ]
+  },
+  "raisins": {
+    "per100": {
+      "kcal": 299,
+      "protein": 3.1,
+      "carbs": 79.2,
+      "fat": 0.5,
+      "fiber": 3.7
+    },
+    "portions": {
+      "tbsp": 10,
+      "handful": 40
+    },
+    "aliases": [
+      "kishmish",
+      "raisin"
+    ]
+  },
+  "dried apricot": {
+    "per100": {
+      "kcal": 241,
+      "protein": 3.4,
+      "carbs": 62.6,
+      "fat": 0.5,
+      "fiber": 7.3
+    },
+    "portions": {
+      "piece": 8,
+      "handful": 40
+    },
+    "aliases": [
+      "khumani",
+      "apricot dry",
+      "dry apricot"
+    ]
+  },
+  "prunes": {
+    "per100": {
+      "kcal": 240,
+      "protein": 2.2,
+      "carbs": 63.9,
+      "fat": 0.4,
+      "fiber": 7.1
+    },
+    "portions": {
+      "piece": 9.5,
+      "handful": 42
+    },
+    "aliases": [
+      "prune",
+      "dried plum"
+    ]
+  },
+  "dried fig": {
+    "per100": {
+      "kcal": 249,
+      "protein": 3.3,
+      "carbs": 63.9,
+      "fat": 0.9,
+      "fiber": 9.8
+    },
+    "portions": {
+      "piece": 8,
+      "handful": 40
+    },
+    "aliases": [
+      "anjeer",
+      "dry anjeer",
+      "dry fig"
+    ]
   }
 }
