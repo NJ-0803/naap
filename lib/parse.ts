@@ -18,6 +18,7 @@ export type Intent =
   | { kind: "logKnown"; meal: string | null; description: string; macros: KnownMacros }
   | { kind: "status" }
   | { kind: "weight"; kg: number }
+  | { kind: "height"; cm: number }
   | { kind: "undo"; count: number }
   | { kind: "items" }
   | { kind: "delete"; index: number }
@@ -57,6 +58,10 @@ Pick exactly one intent:
   target — one number per macro, nothing itemized ("how am I doing", "calories
   left", "how much protein do I have").
 - log_weight: a bare number, or "w 71.4", or "weighed 71.4" — a bodyweight in kg.
+- set_height: they state their height, for BMI — "height 172", "I'm 172cm",
+  "my height is 5'8" (convert feet/inches to cm: (feet*12+inches)*2.54). A
+  bare number alone is always log_weight, never this — height must be named
+  explicitly or carry a height unit (cm, ft, ').
 - undo_entry: they want the most recently logged entry (or last N) removed,
   with no specific food named ("undo", "remove the last thing", "undo last 2").
 - list_items: they want each food they logged today broken out individually,
@@ -170,6 +175,18 @@ const TOOLS: Groq.Chat.Completions.ChatCompletionTool[] = [
         type: "object",
         properties: { kg: { type: "number" } },
         required: ["kg"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "set_height",
+      description: "Record the user's height in centimetres, for BMI.",
+      parameters: {
+        type: "object",
+        properties: { cm: { type: "number" } },
+        required: ["cm"],
       },
     },
   },
@@ -343,6 +360,13 @@ export async function parseMessage(text: string, localTime: string): Promise<Int
         return { kind: "other", reply: "That doesn't look like a weight in kg." };
       }
       return { kind: "weight", kg };
+    }
+    case "set_height": {
+      const cm = Number(args.cm);
+      if (!Number.isFinite(cm) || cm < 50 || cm > 272) {
+        return { kind: "other", reply: "That doesn't look like a height in cm." };
+      }
+      return { kind: "height", cm };
     }
     case "undo_entry":
       return { kind: "undo", count: Math.max(1, Number(args.count ?? 1)) };

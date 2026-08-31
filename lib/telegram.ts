@@ -1,3 +1,5 @@
+import { bmi, bmiCategory } from "./ledger";
+
 const API = (method: string) =>
   `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/${method}`;
 
@@ -67,6 +69,21 @@ function bar(pct: number, width = 10): string {
   return BAR_FULL.repeat(filled) + BAR_EMPTY.repeat(width - filled);
 }
 
+/**
+ * BMI, shown as the first line of every card once both inputs are known.
+ * Weight comes from the user's latest weigh-in (see getTargets), height from
+ * /height — nothing here is estimated, same rule as the macro math below.
+ */
+function renderBmi(weightKg: number | null | undefined, heightCm: number | null | undefined): string {
+  const value = bmi(weightKg, heightCm);
+  if (value === null) {
+    return heightCm
+      ? "BMI      log a weigh-in (e.g. 71.4) to see it\n"
+      : "BMI      set your height — /height 172 — to see it\n";
+  }
+  return `BMI      ${value.toFixed(1)}  (${bmiCategory(value)})\n`;
+}
+
 /** The day block, rendered as monospace so the columns line up on a phone. */
 export function renderDay(
   totals: Record<string, number>,
@@ -90,7 +107,7 @@ export function renderDay(
       ).padStart(3)}%  ${sign}${Math.abs(Math.round(left))}`
     );
   }
-  return `<pre>${rows.join("\n")}</pre>`;
+  return `<pre>${renderBmi(targets.weight_kg, targets.height_cm)}${rows.join("\n")}</pre>`;
 }
 
 export function escapeHtml(s: string): string {

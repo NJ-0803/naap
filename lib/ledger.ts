@@ -164,6 +164,21 @@ export function localDay(timezone: string, at: Date = new Date()): string {
   }).format(at);
 }
 
+/** Standard WHO adult BMI bands. */
+export function bmiCategory(value: number): string {
+  if (value < 18.5) return "Underweight";
+  if (value < 25) return "Normal";
+  if (value < 30) return "Overweight";
+  return "Obese";
+}
+
+/** kg / m^2. Returns null when either input is missing or non-physical. */
+export function bmi(weightKg: number | null | undefined, heightCm: number | null | undefined): number | null {
+  if (!weightKg || !heightCm || weightKg <= 0 || heightCm <= 0) return null;
+  const m = heightCm / 100;
+  return weightKg / (m * m);
+}
+
 /** Infer the meal from local time when the user didn't name one. */
 export function inferMeal(timezone: string, at: Date = new Date()): string {
   const hour = Number(

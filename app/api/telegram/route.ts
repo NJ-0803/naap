@@ -14,7 +14,7 @@ import { parseMessage } from "@/lib/parse";
 import {
   upsertUser, getTargets, loadFoods, claimUpdate, insertEntries,
   dayTotals, undoEntries, listEntries, deleteEntryAt, deleteLatestByFood, logWeight,
-  learnFood, setTargets, sql,
+  learnFood, setTargets, setHeight, sql,
 } from "@/lib/db";
 import {
   currentStreak, setUsername, createLeague, joinLeague, standings, renderStandings,
@@ -215,6 +215,19 @@ async function handle(
       break;
     }
 
+    case "height": {
+      await setHeight(user.id, intent.cm);
+      const targets = await getTargets(user.id);
+      await sendMessage(
+        chatId,
+        `Height set: <b>${intent.cm} cm</b>` +
+          (targets.weight_kg
+            ? `\nYour BMI will show at the top of your daily card from now on.`
+            : `\nLog a weigh-in (e.g. <code>71.4</code>) and your BMI will show at the top of your daily card.`)
+      );
+      break;
+    }
+
     case "undo": {
       const removed = await undoEntries(user.id, intent.count);
       if (!removed.length) {
@@ -409,11 +422,13 @@ async function slashCommand(
           `<b>Also understands</b>\n` +
           `• “how much protein do I have left”\n• a bare number like <code>71.4</code> (weigh-in)\n` +
           `• “undo” (removes the last thing logged)\n• “show me sunday”\n` +
+          `• your height, e.g. “height 172” or /height 172 — shows your BMI at the top of every card\n` +
           `• already did the maths yourself? “bread + chicken = 560 cals” logs it as-is, no lookup\n\n` +
           `<b>Logged something wrong?</b>\nSend /items to see today's list, numbered. ` +
           `Then say <code>delete 2</code> (or /delete 2) to remove just that one — ` +
           `everything else logged that day stays put.\n\n` +
           `<b>Commands</b>\n` +
+          `/height &lt;cm&gt; — set your height, for BMI\n` +
           `/items — today's entries, numbered\n` +
           `/delete &lt;n&gt; — remove one specific entry\n` +
           `/streak — your logging streak\n` +
@@ -487,6 +502,24 @@ async function slashCommand(
         n === 0
           ? "No streak yet — log something today to start one. 🔥"
           : `🔥 <b>${n} day${n === 1 ? "" : "s"}</b> logged in a row.`
+      );
+      return true;
+    }
+
+    case "height": {
+      const cm = Math.round(Number(arg));
+      if (!Number.isFinite(cm) || cm < 50 || cm > 272) {
+        await sendMessage(chatId, "Usage: <code>/height 172</code> (in cm)");
+        return true;
+      }
+      await setHeight(user.id, cm);
+      const targets = await getTargets(user.id);
+      await sendMessage(
+        chatId,
+        `Height set: <b>${cm} cm</b>` +
+          (targets.weight_kg
+            ? `\nYour BMI will show at the top of your daily card from now on.`
+            : `\nLog a weigh-in (e.g. <code>71.4</code>) and your BMI will show at the top of your daily card.`)
       );
       return true;
     }

@@ -11,7 +11,7 @@ export type User = {
   timezone: string;
 };
 
-export type Targets = Macros & { goal: string; weight_kg: number | null };
+export type Targets = Macros & { goal: string; weight_kg: number | null; height_cm: number | null };
 
 /** Find or create the user behind a Telegram message. */
 export async function upsertUser(
@@ -36,12 +36,26 @@ export async function upsertUser(
   return user;
 }
 
+/**
+ * `weight_kg` here is the most recent real weigh-in from `weights`, falling
+ * back to whatever's stashed on `targets` — so BMI always uses current
+ * weight, not a stale one-time value.
+ */
 export async function getTargets(userId: number): Promise<Targets> {
   const rows = (await sql`
-    SELECT kcal, protein, carbs, fat, fiber, goal, weight_kg
-    FROM targets WHERE user_id = ${userId}
+    SELECT t.kcal, t.protein, t.carbs, t.fat, t.fiber, t.goal, t.height_cm,
+           COALESCE(w.kg, t.weight_kg) AS weight_kg
+    FROM targets t
+    LEFT JOIN LATERAL (
+      SELECT kg FROM weights WHERE user_id = t.user_id ORDER BY day DESC LIMIT 1
+    ) w ON true
+    WHERE t.user_id = ${userId}
   `) as Targets[];
   return rows[0];
+}
+
+export async function setHeight(userId: number, cm: number): Promise<void> {
+  await sql`UPDATE targets SET height_cm = ${cm} WHERE user_id = ${userId}`;
 }
 
 /**

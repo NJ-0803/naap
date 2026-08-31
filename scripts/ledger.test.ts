@@ -1,4 +1,4 @@
-import { findFood, toGrams, macrosFor, implausible, inferMeal, localDay, type Food } from "../lib/ledger.ts";
+import { findFood, toGrams, macrosFor, implausible, inferMeal, localDay, bmi, bmiCategory, type Food } from "../lib/ledger.ts";
 
 const foods: Food[] = [
   { id: 1, key: "roti", aliases: ["chapati", "phulka", "rotis"], kcal: 297, protein: 11, carbs: 58, fat: 3.7, fiber: 8.4, portions: { piece: 45 } },
@@ -45,6 +45,13 @@ check("guard still rejects an insane stated total", implausible({ kcal: 9000, pr
 const day = localDay("Asia/Kolkata");
 check("localDay is ISO", /^\d{4}-\d{2}-\d{2}$/.test(day), day);
 check("meal inferred from hour", ["breakfast","lunch","dinner","snack"].includes(inferMeal("Asia/Kolkata")));
+
+// BMI: kg / m^2, missing inputs return null rather than a garbage number
+check("bmi(71.5, 172) ≈ 24.2", Math.abs(bmi(71.5, 172)! - 24.17) < 0.05, `got ${bmi(71.5, 172)}`);
+check("bmi missing weight returns null", bmi(null, 172) === null);
+check("bmi missing height returns null", bmi(71.5, undefined) === null);
+check("bmiCategory bands", bmiCategory(17) === "Underweight" && bmiCategory(22) === "Normal" &&
+  bmiCategory(27) === "Overweight" && bmiCategory(32) === "Obese");
 
 console.log(`\n  ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
