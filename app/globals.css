@@ -436,16 +436,29 @@ section { padding-top: 54px; }
   margin-bottom: 6px;
   font-variant-numeric: tabular-nums;
 }
+.day .n.good { color: var(--mint); }
+.day .n.low { color: var(--amber); }
+.day .n.over { color: var(--red); }
 .day .col { flex: 1; width: 100%; display: flex; align-items: flex-end; }
 .day .bar {
   width: 100%;
   min-height: 3px;
   border-radius: 6px 6px 2px 2px;
-  /* muted by default so the amber over-target day is the thing that reads */
-  background: linear-gradient(180deg, #3d4d63, #27323f);
-  transition: height 0.9s cubic-bezier(0.2, 0.7, 0.3, 1);
+  transition: filter 0.2s ease;
 }
-.day .bar.over { background: var(--amber); }
+.day .bar:hover { filter: brightness(1.2); }
+/* Same red/mint/amber/ink language as the rest of the dashboard (see tone()) —
+   a day's bar reads the same way its kcal number does at the top of the page. */
+.day .bar.on { background: linear-gradient(180deg, #3d4d63, #27323f); }
+.day .bar.good {
+  background: linear-gradient(180deg, #6ee8a8, var(--mint));
+  box-shadow: 0 0 18px -6px rgba(74, 222, 128, 0.55);
+}
+.day .bar.low { background: linear-gradient(180deg, #ffc17c, var(--amber)); }
+.day .bar.over {
+  background: linear-gradient(180deg, #ff7186, var(--red));
+  box-shadow: 0 0 18px -6px rgba(255, 46, 76, 0.5);
+}
 .day .bar.none { background: var(--line); }
 .day .lab {
   font-family: var(--display);

@@ -14,7 +14,7 @@ import { currentStreak, standings } from "@/lib/social";
 import { weeklyLines } from "@/lib/rivalry";
 import { periodStats, weightTrend } from "@/lib/analysis";
 import { createLeagueAction, joinLeagueAction, setUsernameAction } from "./actions";
-import { Reveal, Lift, LiftForm, LiftButton } from "./Motion";
+import { Reveal, Lift, LiftForm, LiftButton, GrowBar } from "./Motion";
 import "../globals.css";
 
 export const dynamic = "force-dynamic";
@@ -185,10 +185,12 @@ export default async function Dash() {
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = localDay(user.timezone, -(6 - i));
     const hit = weekRows.find((r) => r.day.slice(0, 10) === d);
+    const kcal = hit?.kcal ?? 0;
     return {
       day: d,
       label: new Date(`${d}T12:00:00Z`).toLocaleDateString("en-GB", { weekday: "short" }),
-      kcal: hit?.kcal ?? 0,
+      kcal,
+      pct: targets.kcal ? (kcal / targets.kcal) * 100 : 0,
       logged: Boolean(hit),
     };
   });
@@ -337,11 +339,11 @@ export default async function Dash() {
             </div>
             {week.map((w) => (
               <div className="day" key={w.day}>
-                <div className="n">{w.logged ? Math.round(w.kcal) : "—"}</div>
+                <div className={`n ${w.logged ? tone(w.pct) : ""}`}>{w.logged ? Math.round(w.kcal) : "—"}</div>
                 <div className="col">
-                  <div
-                    className={`bar ${!w.logged ? "none" : w.kcal > targets.kcal * 1.05 ? "over" : ""}`}
-                    style={{ height: `${Math.max(2, (w.kcal / peak) * 100)}%` }}
+                  <GrowBar
+                    className={`bar ${!w.logged ? "none" : tone(w.pct)}`}
+                    heightPct={Math.max(2, (w.kcal / peak) * 100)}
                   />
                 </div>
                 <div className="lab">{w.label}</div>

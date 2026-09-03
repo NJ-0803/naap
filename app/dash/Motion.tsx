@@ -70,3 +70,21 @@ export function LiftForm({ className, children, ...rest }: ComponentProps<typeof
 export function LiftButton(props: ComponentProps<typeof motion.button>) {
   return <motion.button whileHover={HOVER_SCALE} whileTap={TAP_SCALE} transition={LIQUID_SPRING} {...props} />;
 }
+
+/**
+ * A week-chart bar that actually grows in. The server renders the final
+ * height directly (no client state change happens), so a plain CSS
+ * `transition: height` — what was here before — never has anything to
+ * animate from. This is the one place that genuinely needs client state:
+ * start at 0 and spring up to the real value once mounted.
+ */
+export function GrowBar({ heightPct, className }: { heightPct: number; className?: string }) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ height: 0 }}
+      animate={{ height: `${heightPct}%` }}
+      transition={LIQUID_SPRING}
+    />
+  );
+}
