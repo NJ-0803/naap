@@ -119,7 +119,9 @@ function CoachCard({ note }: { note: CoachNote | null }) {
           ? note.text
           : "Nothing flagged — either you're within range on everything, or there isn't enough logged yet to tell."}
       </div>
-      <div className="tag">non-deterministic — reasoning, not math · regenerates once a day</div>
+      <div className="tag">
+        {note ? `${note.model} — ` : ""}non-deterministic, reasoning not math · regenerates once a day
+      </div>
     </TiltCard>
   );
 }
