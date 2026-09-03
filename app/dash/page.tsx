@@ -12,7 +12,9 @@ import { verifyToken, SESSION_COOKIE } from "@/lib/auth";
 import { sql, listEntries } from "@/lib/db";
 import { currentStreak, standings } from "@/lib/social";
 import { weeklyLines } from "@/lib/rivalry";
+import { periodStats, weightTrend } from "@/lib/analysis";
 import { createLeagueAction, joinLeagueAction, setUsernameAction } from "./actions";
+import { Reveal, Lift, LiftForm, LiftButton } from "./Motion";
 import "../globals.css";
 
 export const dynamic = "force-dynamic";
@@ -36,12 +38,80 @@ function trim(n: number): string {
   return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)));
 }
 
+function dayLabel(d: string): string {
+  return new Date(`${d}T12:00:00Z`).toLocaleDateString("en-GB", {
+    weekday: "short", day: "numeric", month: "short",
+  });
+}
+
 function localDay(tz: string, offsetDays = 0): string {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() + offsetDays);
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
   }).format(d);
+}
+
+function AnalysisPanel({
+  label, stats, weight, targets,
+}: {
+  label: string;
+  stats: ReturnType<typeof periodStats>;
+  weight: ReturnType<typeof weightTrend>;
+  targets: Record<string, number>;
+}) {
+  const kcalPct = targets.kcal ? (stats.avg.kcal / targets.kcal) * 100 : 0;
+  const proteinPct = targets.protein ? (stats.avg.protein / targets.protein) * 100 : 0;
+
+  return (
+    <Lift className="panel">
+      <div className="badge">{label}</div>
+
+      <div className="k">days logged</div>
+      <div className="v">{stats.daysLogged}/{stats.totalDays}</div>
+      <div className="sub">
+        {stats.daysLogged
+          ? `${Math.round(stats.kcalAdherencePct)}% on-target kcal · ${Math.round(stats.proteinAdherencePct)}% hit protein`
+          : "nothing logged yet"}
+      </div>
+
+      {stats.daysLogged > 0 && (
+        <>
+          <div className="k">avg kcal / protein</div>
+          <div className="v sm">
+            <span className={tone(kcalPct)}>{Math.round(stats.avg.kcal)}</span>
+            {" / "}
+            <span className={tone(proteinPct, true)}>{Math.round(stats.avg.protein)}g</span>
+          </div>
+          <div className="sub">of {Math.round(targets.kcal)} kcal · {Math.round(targets.protein)}g target</div>
+        </>
+      )}
+
+      {stats.best && stats.hardest && (
+        <>
+          <div className="k">best day</div>
+          <div className="v sm">{dayLabel(stats.best.day)}</div>
+          <div className="sub">{Math.round(stats.best.kcal)} kcal · {Math.round(stats.best.protein)}g protein</div>
+
+          <div className="k">hardest day</div>
+          <div className="v sm">{dayLabel(stats.hardest.day)}</div>
+          <div className="sub">{Math.round(stats.hardest.kcal)} kcal · {Math.round(stats.hardest.protein)}g protein</div>
+        </>
+      )}
+
+      <div className="k">weight</div>
+      {weight ? (
+        <>
+          <div className="v sm">{trim(weight.first)} → {trim(weight.last)} kg</div>
+          <div className="sub">
+            {weight.deltaKg > 0 ? "+" : ""}{trim(weight.deltaKg)} kg over {weight.count} weigh-ins
+          </div>
+        </>
+      ) : (
+        <div className="sub low">no weigh-ins logged this period</div>
+      )}
+    </Lift>
+  );
 }
 
 export default async function Dash() {
@@ -90,6 +160,27 @@ export default async function Dash() {
     FROM entries WHERE user_id = ${userId} AND day >= ${since} AND day <= ${today}
     GROUP BY day ORDER BY day
   `) as { day: string; kcal: number; protein: number }[];
+
+  // Analysis // 04 — rolling 30 days, same window the Telegram review used.
+  const monthSince = localDay(user.timezone, -29);
+  const monthRows = (await sql`
+    SELECT day::text AS day, SUM(kcal)::float kcal, SUM(protein)::float protein,
+           SUM(carbs)::float carbs, SUM(fat)::float fat, SUM(fiber)::float fiber
+    FROM entries WHERE user_id = ${userId} AND day >= ${monthSince} AND day <= ${today}
+    GROUP BY day ORDER BY day
+  `) as { day: string; kcal: number; protein: number; carbs: number; fat: number; fiber: number }[];
+  const weekAnalysisRows = monthRows.filter((r) => r.day >= since);
+
+  const weightRows = (await sql`
+    SELECT day::text AS day, kg::float kg FROM weights
+    WHERE user_id = ${userId} AND day >= ${monthSince} AND day <= ${today}
+    ORDER BY day
+  `) as { day: string; kg: number }[];
+
+  const weekStats = periodStats(weekAnalysisRows, 7, targets);
+  const monthStats = periodStats(monthRows, 30, targets);
+  const weekWeight = weightTrend(weightRows.filter((w) => w.day >= since));
+  const monthWeight = weightTrend(weightRows);
 
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = localDay(user.timezone, -(6 - i));
@@ -149,6 +240,7 @@ export default async function Dash() {
         </header>
 
         {/* ---- 01 ---- */}
+        <Reveal>
         <section>
           <div className="eyebrow">Naap // today&apos;s measure</div>
           <div className="head">
@@ -193,12 +285,12 @@ export default async function Dash() {
           {meals.length > 0 && (
             <div className="grid c4">
               {meals.map((m, i) => (
-                <div className="panel" key={m.meal}>
+                <Lift className="panel" key={m.meal}>
                   <div className="badge">{String(i + 1).padStart(2, "0")} / {m.meal}</div>
                   <div className="k">calories</div>
                   <div className="v">{Math.round(m.kcal)}</div>
                   <div className="sub">{Math.round(m.protein)} g protein</div>
-                </div>
+                </Lift>
               ))}
             </div>
           )}
@@ -223,8 +315,10 @@ export default async function Dash() {
             </div>
           )}
         </section>
+        </Reveal>
 
         {/* ---- 02 ---- */}
+        <Reveal>
         <section>
           <div className="eyebrow">Consistency // rolling seven days</div>
           <div className="head">
@@ -255,8 +349,10 @@ export default async function Dash() {
             ))}
           </div>
         </section>
+        </Reveal>
 
         {/* ---- 03 ---- */}
+        <Reveal>
         <section>
           <div className="eyebrow">League // consistency, not calories</div>
           <div className="head">
@@ -270,7 +366,7 @@ export default async function Dash() {
             <>
               <div className="rows">
                 {table.map((r, i) => (
-                  <div
+                  <Lift
                     className={`row ${r.user_id === userId ? "me" : ""} ${i < 3 ? "top" : ""}`}
                     key={r.user_id}
                   >
@@ -283,7 +379,7 @@ export default async function Dash() {
                       P{r.protein_days}
                     </div>
                     <div className="stat streak">{r.streak > 0 ? `${r.streak}d` : "—"}</div>
-                  </div>
+                  </Lift>
                 ))}
               </div>
               {lines.map((l, i) => (
@@ -297,7 +393,7 @@ export default async function Dash() {
           {/* ---- invite / join ---- */}
           <div className="invite">
             {leagues.length ? (
-              <div className="panel">
+              <Lift className="panel">
                 <div className="badge">invite</div>
                 <div className="k">share this code</div>
                 <div className="code">{leagues[0].join_code}</div>
@@ -305,36 +401,55 @@ export default async function Dash() {
                   Friends open the bot and send <b>/join {leagues[0].join_code}</b> — or paste
                   the code below on their own dashboard.
                 </div>
-              </div>
+              </Lift>
             ) : (
-              <form action={createLeagueAction} className="panel">
+              <LiftForm action={createLeagueAction} className="panel">
                 <div className="badge">start</div>
                 <div className="k">create a league</div>
                 <input name="name" placeholder="Gym Bros" maxLength={40} required />
-                <button type="submit">Create</button>
+                <LiftButton type="submit">Create</LiftButton>
                 <div className="sub">You&apos;ll get a code to share.</div>
-              </form>
+              </LiftForm>
             )}
 
-            <form action={joinLeagueAction} className="panel">
+            <LiftForm action={joinLeagueAction} className="panel">
               <div className="badge">join</div>
               <div className="k">have a code?</div>
               <input name="code" placeholder="ABC123" maxLength={12} required />
-              <button type="submit">Join</button>
+              <LiftButton type="submit">Join</LiftButton>
               <div className="sub">Ask a friend for the code on their dashboard.</div>
-            </form>
+            </LiftForm>
 
             {!user.username && (
-              <form action={setUsernameAction} className="panel">
+              <LiftForm action={setUsernameAction} className="panel">
                 <div className="badge">handle</div>
                 <div className="k">claim a name</div>
                 <input name="handle" placeholder="yourname" maxLength={20} required />
-                <button type="submit">Set</button>
+                <LiftButton type="submit">Set</LiftButton>
                 <div className="sub">This is how you appear on the table.</div>
-              </form>
+              </LiftForm>
             )}
           </div>
         </section>
+        </Reveal>
+
+        {/* ---- 04 ---- */}
+        <Reveal>
+        <section>
+          <div className="eyebrow">Analysis // review, not vibes</div>
+          <div className="head">
+            <h2>
+              <span className="mark">// 04.</span> Analysis
+            </h2>
+            <div className="count">week &amp; 30-day</div>
+          </div>
+
+          <div className="grid c2">
+            <AnalysisPanel label="this week" stats={weekStats} weight={weekWeight} targets={targets} />
+            <AnalysisPanel label="last 30 days" stats={monthStats} weight={monthWeight} targets={targets} />
+          </div>
+        </section>
+        </Reveal>
 
         <footer>
           <span>{user.username ? `@${user.username}` : user.name ?? "you"}</span>

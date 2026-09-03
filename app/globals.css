@@ -31,6 +31,16 @@
   --body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   --gutter: clamp(18px, 4vw, 56px);
+
+  /* Liquid glass: same red/black/ink identity, translucent + blurred surfaces
+     instead of flat ones. Only surfaces (panels, rows, chips) get this —
+     the ruler frame and gauges stay sharp, they're chrome, not glass. */
+  --radius: 20px;
+  --radius-sm: 14px;
+  --glass: rgba(15, 19, 28, 0.55);
+  --glass-2: rgba(19, 24, 36, 0.5);
+  --glass-border: rgba(237, 241, 247, 0.08);
+  --glass-blur: 20px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -234,6 +244,7 @@ section { padding-top: 54px; }
   height: 10px;
   background: var(--line-soft);
   border: 1px solid var(--line);
+  border-radius: 6px;
   overflow: hidden;
   position: relative;
 }
@@ -265,33 +276,42 @@ section { padding-top: 54px; }
 /* ---------- panels, badges, chips ---------- */
 
 .grid { display: grid; gap: 14px; margin-top: 28px; }
+.grid.c2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 .grid.c3 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 .grid.c4 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 
 .panel {
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
   padding: 18px 20px;
   position: relative;
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.65);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
-.panel.me { border-color: var(--red); background: var(--red-dim); }
+.panel:hover { border-color: rgba(255, 46, 76, 0.35); box-shadow: 0 12px 34px -14px rgba(255, 46, 76, 0.16); }
+.panel.me { border-color: rgba(255, 46, 76, 0.55); background: rgba(255, 46, 76, 0.16); }
 
 .badge {
   position: absolute;
-  top: -1px;
-  left: -1px;
+  top: 0;
+  left: 0;
   font-family: var(--display);
   font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--faint);
-  border: 1px solid var(--line);
+  border: 1px solid var(--glass-border);
   border-top: 0;
   border-left: 0;
   padding: 4px 10px;
-  background: var(--panel-2);
+  background: rgba(19, 24, 36, 0.65);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius) 0 var(--radius-sm) 0;
 }
-.panel.me .badge { color: var(--red); border-color: var(--red); }
+.panel.me .badge { color: var(--red); border-color: rgba(255, 46, 76, 0.5); }
 
 .panel .k {
   font-family: var(--display);
@@ -310,6 +330,7 @@ section { padding-top: 54px; }
   letter-spacing: -0.01em;
 }
 .panel .sub { font-size: 13px; color: var(--dim); margin-top: 3px; }
+.panel .v.sm { font-size: 18px; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .chip {
@@ -340,9 +361,12 @@ section { padding-top: 54px; }
   grid-template-columns: 1fr auto auto auto;
   gap: 14px;
   align-items: baseline;
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--glass-2);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
   padding: 10px 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 .item .food {
   font-family: var(--display);
@@ -416,6 +440,7 @@ section { padding-top: 54px; }
 .day .bar {
   width: 100%;
   min-height: 3px;
+  border-radius: 6px 6px 2px 2px;
   /* muted by default so the amber over-target day is the thing that reads */
   background: linear-gradient(180deg, #3d4d63, #27323f);
   transition: height 0.9s cubic-bezier(0.2, 0.7, 0.3, 1);
@@ -439,11 +464,16 @@ section { padding-top: 54px; }
   grid-template-columns: 46px 1fr auto auto auto;
   gap: 14px;
   align-items: center;
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
   padding: 13px 16px;
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  transition: border-color 0.25s ease;
 }
-.row.me { border-color: var(--red); background: var(--red-dim); }
+.row:hover { border-color: rgba(255, 46, 76, 0.3); }
+.row.me { border-color: rgba(255, 46, 76, 0.55); background: rgba(255, 46, 76, 0.14); }
 .row .rank {
   font-family: var(--display);
   font-size: 17px;
@@ -472,7 +502,10 @@ section { padding-top: 54px; }
   margin-top: 22px;
   padding: 15px 18px;
   border-left: 2px solid var(--red);
-  background: var(--panel);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--glass-2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   font-size: 14.5px;
   color: var(--ink);
 }
@@ -529,12 +562,14 @@ a { color: var(--red); }
   font-family: var(--display);
   font-size: 15px;
   letter-spacing: 0.08em;
-  background: var(--ground);
-  border: 1px solid var(--line);
+  background: rgba(10, 13, 20, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
   color: var(--ink);
   padding: 10px 12px;
   margin: 10px 0 8px;
   width: 100%;
+  backdrop-filter: blur(10px);
 }
 .invite input::placeholder { color: var(--faint); }
 .invite input:focus { outline: none; border-color: var(--red); }
@@ -546,10 +581,12 @@ a { color: var(--red); }
   background: var(--red);
   color: #0a0d14;
   border: 0;
+  border-radius: 999px;
   padding: 10px 18px;
   cursor: pointer;
   align-self: flex-start;
   font-weight: 700;
+  box-shadow: 0 6px 20px -8px rgba(255, 46, 76, 0.55);
 }
 .invite button:hover { filter: brightness(1.12); }
 .invite .sub { margin-top: 10px; }
