@@ -12,9 +12,9 @@ import { verifyToken, SESSION_COOKIE } from "@/lib/auth";
 import { sql, listEntries } from "@/lib/db";
 import { currentStreak, standings } from "@/lib/social";
 import { weeklyLines } from "@/lib/rivalry";
-import { periodStats, weightTrend } from "@/lib/analysis";
 import { createLeagueAction, joinLeagueAction, setUsernameAction } from "./actions";
 import { Reveal, Lift, LiftForm, LiftButton, GrowBar } from "./Motion";
+import Link from "next/link";
 import "../globals.css";
 
 export const dynamic = "force-dynamic";
@@ -38,80 +38,12 @@ function trim(n: number): string {
   return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)));
 }
 
-function dayLabel(d: string): string {
-  return new Date(`${d}T12:00:00Z`).toLocaleDateString("en-GB", {
-    weekday: "short", day: "numeric", month: "short",
-  });
-}
-
 function localDay(tz: string, offsetDays = 0): string {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() + offsetDays);
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit",
   }).format(d);
-}
-
-function AnalysisPanel({
-  label, stats, weight, targets,
-}: {
-  label: string;
-  stats: ReturnType<typeof periodStats>;
-  weight: ReturnType<typeof weightTrend>;
-  targets: Record<string, number>;
-}) {
-  const kcalPct = targets.kcal ? (stats.avg.kcal / targets.kcal) * 100 : 0;
-  const proteinPct = targets.protein ? (stats.avg.protein / targets.protein) * 100 : 0;
-
-  return (
-    <Lift className="panel">
-      <div className="badge">{label}</div>
-
-      <div className="k">days logged</div>
-      <div className="v">{stats.daysLogged}/{stats.totalDays}</div>
-      <div className="sub">
-        {stats.daysLogged
-          ? `${Math.round(stats.kcalAdherencePct)}% on-target kcal · ${Math.round(stats.proteinAdherencePct)}% hit protein`
-          : "nothing logged yet"}
-      </div>
-
-      {stats.daysLogged > 0 && (
-        <>
-          <div className="k">avg kcal / protein</div>
-          <div className="v sm">
-            <span className={tone(kcalPct)}>{Math.round(stats.avg.kcal)}</span>
-            {" / "}
-            <span className={tone(proteinPct, true)}>{Math.round(stats.avg.protein)}g</span>
-          </div>
-          <div className="sub">of {Math.round(targets.kcal)} kcal · {Math.round(targets.protein)}g target</div>
-        </>
-      )}
-
-      {stats.best && stats.hardest && (
-        <>
-          <div className="k">best day</div>
-          <div className="v sm">{dayLabel(stats.best.day)}</div>
-          <div className="sub">{Math.round(stats.best.kcal)} kcal · {Math.round(stats.best.protein)}g protein</div>
-
-          <div className="k">hardest day</div>
-          <div className="v sm">{dayLabel(stats.hardest.day)}</div>
-          <div className="sub">{Math.round(stats.hardest.kcal)} kcal · {Math.round(stats.hardest.protein)}g protein</div>
-        </>
-      )}
-
-      <div className="k">weight</div>
-      {weight ? (
-        <>
-          <div className="v sm">{trim(weight.first)} → {trim(weight.last)} kg</div>
-          <div className="sub">
-            {weight.deltaKg > 0 ? "+" : ""}{trim(weight.deltaKg)} kg over {weight.count} weigh-ins
-          </div>
-        </>
-      ) : (
-        <div className="sub low">no weigh-ins logged this period</div>
-      )}
-    </Lift>
-  );
 }
 
 export default async function Dash() {
@@ -160,27 +92,6 @@ export default async function Dash() {
     FROM entries WHERE user_id = ${userId} AND day >= ${since} AND day <= ${today}
     GROUP BY day ORDER BY day
   `) as { day: string; kcal: number; protein: number }[];
-
-  // Analysis // 04 — rolling 30 days, same window the Telegram review used.
-  const monthSince = localDay(user.timezone, -29);
-  const monthRows = (await sql`
-    SELECT day::text AS day, SUM(kcal)::float kcal, SUM(protein)::float protein,
-           SUM(carbs)::float carbs, SUM(fat)::float fat, SUM(fiber)::float fiber
-    FROM entries WHERE user_id = ${userId} AND day >= ${monthSince} AND day <= ${today}
-    GROUP BY day ORDER BY day
-  `) as { day: string; kcal: number; protein: number; carbs: number; fat: number; fiber: number }[];
-  const weekAnalysisRows = monthRows.filter((r) => r.day >= since);
-
-  const weightRows = (await sql`
-    SELECT day::text AS day, kg::float kg FROM weights
-    WHERE user_id = ${userId} AND day >= ${monthSince} AND day <= ${today}
-    ORDER BY day
-  `) as { day: string; kg: number }[];
-
-  const weekStats = periodStats(weekAnalysisRows, 7, targets);
-  const monthStats = periodStats(monthRows, 30, targets);
-  const weekWeight = weightTrend(weightRows.filter((w) => w.day >= since));
-  const monthWeight = weightTrend(weightRows);
 
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = localDay(user.timezone, -(6 - i));
@@ -446,10 +357,18 @@ export default async function Dash() {
             <div className="count">week &amp; 30-day</div>
           </div>
 
-          <div className="grid c2">
-            <AnalysisPanel label="this week" stats={weekStats} weight={weekWeight} targets={targets} />
-            <AnalysisPanel label="last 30 days" stats={monthStats} weight={monthWeight} targets={targets} />
-          </div>
+          <Link href="/dash/analysis" className="cta-link">
+            <Lift className="panel cta">
+              <div className="badge">open</div>
+              <div className="k">full review</div>
+              <div className="v sm">
+                {loggedDays}/7 logged this week <span className="arrow">→</span>
+              </div>
+              <div className="sub">
+                Trends, best/hardest day, weigh-ins, and a coach note on where to eat differently.
+              </div>
+            </Lift>
+          </Link>
         </section>
         </Reveal>
 

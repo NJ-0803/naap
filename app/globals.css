@@ -332,6 +332,35 @@ section { padding-top: 54px; }
 .panel .sub { font-size: 13px; color: var(--dim); margin-top: 3px; }
 .panel .v.sm { font-size: 18px; }
 
+.cta-link { text-decoration: none; color: inherit; display: block; }
+.panel.cta { cursor: pointer; }
+.panel.cta .arrow {
+  display: inline-block;
+  color: var(--red);
+  transition: transform 0.2s ease;
+}
+.panel.cta:hover .arrow { transform: translateX(4px); }
+
+.col-stack { display: flex; flex-direction: column; gap: 14px; }
+
+/* The coach is the one non-deterministic surface on the page — a dashed
+   border marks it as reasoning rather than the measured panels around it. */
+.panel.coach { border-style: dashed; }
+.coach-text {
+  color: var(--ink);
+  font-size: 14.5px;
+  line-height: 1.65;
+  margin-top: 6px;
+}
+.panel .tag {
+  font-family: var(--display);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-top: 16px;
+}
+
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .chip {
   font-family: var(--display);
