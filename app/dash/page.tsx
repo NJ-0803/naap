@@ -13,7 +13,8 @@ import { sql, listEntries } from "@/lib/db";
 import { currentStreak, standings } from "@/lib/social";
 import { weeklyLines } from "@/lib/rivalry";
 import { createLeagueAction, joinLeagueAction, setUsernameAction } from "./actions";
-import { Reveal, Lift, LiftForm, LiftButton, GrowBar } from "./Motion";
+import { Reveal, Lift, LiftForm, LiftButton } from "./Motion";
+import { WeekChart, type DayItem } from "./WeekChart";
 import Link from "next/link";
 import "../globals.css";
 
@@ -88,10 +89,23 @@ export default async function Dash() {
 
   const since = localDay(user.timezone, -6);
   const weekRows = (await sql`
-    SELECT day::text AS day, SUM(kcal)::float kcal, SUM(protein)::float protein
+    SELECT day::text AS day, SUM(kcal)::float kcal, SUM(protein)::float protein,
+           SUM(carbs)::float carbs, SUM(fat)::float fat, SUM(fiber)::float fiber
     FROM entries WHERE user_id = ${userId} AND day >= ${since} AND day <= ${today}
     GROUP BY day ORDER BY day
-  `) as { day: string; kcal: number; protein: number }[];
+  `) as { day: string; kcal: number; protein: number; carbs: number; fat: number; fiber: number }[];
+
+  // Every item for the week, up front — one click on a day-card needs no
+  // fetch of its own, it just opens with data already sitting in this page.
+  const weekItems = (await sql`
+    SELECT id, day::text AS day, meal, food, qty, unit, kcal, protein
+    FROM entries WHERE user_id = ${userId} AND day >= ${since} AND day <= ${today}
+    ORDER BY id ASC
+  `) as (DayItem & { day: string })[];
+  const entriesByDay: Record<string, DayItem[]> = {};
+  for (const it of weekItems) {
+    (entriesByDay[it.day] ??= []).push(it);
+  }
 
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = localDay(user.timezone, -(6 - i));
@@ -101,6 +115,10 @@ export default async function Dash() {
       day: d,
       label: new Date(`${d}T12:00:00Z`).toLocaleDateString("en-GB", { weekday: "short" }),
       kcal,
+      protein: hit?.protein ?? 0,
+      carbs: hit?.carbs ?? 0,
+      fat: hit?.fat ?? 0,
+      fiber: hit?.fiber ?? 0,
       pct: targets.kcal ? (kcal / targets.kcal) * 100 : 0,
       logged: Boolean(hit),
     };
@@ -241,26 +259,7 @@ export default async function Dash() {
             <div className="count">target {Math.round(targets.kcal)} kcal</div>
           </div>
 
-          <div className="week">
-            <div
-              className="target"
-              style={{ bottom: `calc(${(targets.kcal / peak) * 100}% + 26px)` }}
-            >
-              <span>target</span>
-            </div>
-            {week.map((w) => (
-              <div className="day" key={w.day}>
-                <div className={`n ${w.logged ? tone(w.pct) : ""}`}>{w.logged ? Math.round(w.kcal) : "—"}</div>
-                <div className="col">
-                  <GrowBar
-                    className={`bar ${!w.logged ? "none" : tone(w.pct)}`}
-                    heightPct={Math.max(2, (w.kcal / peak) * 100)}
-                  />
-                </div>
-                <div className="lab">{w.label}</div>
-              </div>
-            ))}
-          </div>
+          <WeekChart days={week} entriesByDay={entriesByDay} targets={targets} peak={peak} />
         </section>
         </Reveal>
 

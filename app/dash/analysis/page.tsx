@@ -17,7 +17,7 @@ import { verifyToken, SESSION_COOKIE } from "@/lib/auth";
 import { sql, loadFoods } from "@/lib/db";
 import { periodStats, weightTrend, type PeriodStats, type WeightTrend } from "@/lib/analysis";
 import { getOrCreateCoachNote, type CoachNote } from "@/lib/coach";
-import { Reveal, Lift } from "../Motion";
+import { Reveal, TiltCard } from "../Motion";
 import "../../globals.css";
 
 export const dynamic = "force-dynamic";
@@ -59,7 +59,7 @@ function StatPanel({
   const proteinPct = targets.protein ? (stats.avg.protein / targets.protein) * 100 : 0;
 
   return (
-    <Lift className="panel">
+    <TiltCard className="panel">
       <div className="badge">{label}</div>
 
       <div className="k">days logged</div>
@@ -105,14 +105,14 @@ function StatPanel({
       ) : (
         <div className="sub low">no weigh-ins logged this period</div>
       )}
-    </Lift>
+    </TiltCard>
   );
 }
 
 function CoachCard({ note }: { note: CoachNote | null }) {
   return (
-    <Lift className="panel coach">
-      <div className="badge">coach</div>
+    <TiltCard className="panel coach">
+      <div className="badge"><span className="shimmer-text">✦ coach</span></div>
       <div className="k">where to focus</div>
       <div className="sub coach-text">
         {note
@@ -120,7 +120,7 @@ function CoachCard({ note }: { note: CoachNote | null }) {
           : "Nothing flagged — either you're within range on everything, or there isn't enough logged yet to tell."}
       </div>
       <div className="tag">non-deterministic — reasoning, not math · regenerates once a day</div>
-    </Lift>
+    </TiltCard>
   );
 }
 
