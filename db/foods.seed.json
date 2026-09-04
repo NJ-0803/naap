@@ -1991,6 +1991,51 @@
     },
     "aliases": []
   },
+  "lamb burger small": {
+    "per100": {
+      "kcal": 269.6,
+      "protein": 11.9,
+      "carbs": 17.3,
+      "fat": 17.2,
+      "fiber": 0.8
+    },
+    "portions": {
+      "piece": 104
+    },
+    "aliases": [
+      "small lamb burger"
+    ]
+  },
+  "lamb burger medium": {
+    "per100": {
+      "kcal": 244.1,
+      "protein": 12.5,
+      "carbs": 18.3,
+      "fat": 13.6,
+      "fiber": 0.8
+    },
+    "portions": {
+      "piece": 164
+    },
+    "aliases": [
+      "medium lamb burger"
+    ]
+  },
+  "lamb burger large": {
+    "per100": {
+      "kcal": 230.9,
+      "protein": 12.8,
+      "carbs": 18.8,
+      "fat": 11.7,
+      "fiber": 0.9
+    },
+    "portions": {
+      "piece": 234
+    },
+    "aliases": [
+      "large lamb burger"
+    ]
+  },
   "tandoori chicken": {
     "per100": {
       "kcal": 220,
