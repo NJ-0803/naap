@@ -73,18 +73,33 @@ export function findFood(name: string, foods: Food[]): Food | null {
   const byAlias = foods.find((f) => f.aliases.some((a) => a.toLowerCase() === q));
   if (byAlias) return byAlias;
 
-  const hits = foods.filter(
-    (f) =>
-      q.includes(f.key) ||
-      f.key.includes(q) ||
-      f.aliases.some((a) => {
-        const al = a.toLowerCase();
-        return q.includes(al) || al.includes(q);
-      })
-  );
-  if (!hits.length) return null;
-  // shortest key wins — the most specific match
-  return hits.sort((a, b) => a.key.length - b.key.length)[0];
+  // Whole-word matching only: a raw substring test made "chickpea boiled"
+  // match "oil" (b-OIL-ed). Terms are compared as token runs, plurals folded.
+  const qt = tokens(q);
+  const terms = (f: Food) => [f.key, ...f.aliases].map((t) => tokens(t.toLowerCase()));
+  // 1) a food term appears inside what they said — longest (most specific) wins
+  let best: { f: Food; len: number } | null = null;
+  for (const f of foods) {
+    for (const t of terms(f)) {
+      if (t.length && containsRun(qt, t) && (!best || t.length > best.len)) best = { f, len: t.length };
+    }
+  }
+  if (best) return best.f;
+  // 2) what they said is a piece of a food term ("dal" -> "chana dal") — shortest key wins
+  const partial = foods.filter((f) => terms(f).some((t) => containsRun(t, qt)));
+  return partial.sort((a, b) => a.key.length - b.key.length)[0] ?? null;
+}
+
+function tokens(s: string): string[] {
+  return s.split(/[^a-z0-9]+/).filter(Boolean).map((w) => (w.length > 3 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w));
+}
+
+function containsRun(hay: string[], needle: string[]): boolean {
+  if (!needle.length || needle.length > hay.length) return false;
+  for (let i = 0; i + needle.length <= hay.length; i++) {
+    if (needle.every((w, j) => hay[i + j] === w)) return true;
+  }
+  return false;
 }
 
 /** qty + unit -> grams, using the food's own portion table. */

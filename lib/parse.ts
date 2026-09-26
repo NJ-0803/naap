@@ -103,7 +103,11 @@ For log_food, list every food mentioned with a quantity and unit:
 - Use grams when they gave grams: {"name":"chicken breast","qty":150,"unit":"g"}
 - Otherwise a portion word: piece, katori, bowl, cup, tbsp, tsp, scoop, slice,
   glass, packet, bar, sub, serving, regular, tall, grande, venti
-- Indian foods are common: roti/chapati, dal, rajma, chole, paneer, curd, idli, dosa, poha, sabzi
+- Indian foods are common: roti/chapati, dal, rajma, chole, paneer, curd, idli, dosa, poha, sabzi.
+  English names are just as common (chickpeas, kidney beans, lentils,
+  yogurt, cottage cheese) — keep whatever name they used, in either
+  language. Do not translate, drop, or swap it for another food, and keep
+  cooking words like "boiled" or "fried" with the food name.
 - Franchise/packaged foods are common too: mcdonalds/mcd, dominos, kfc, subway,
   starbucks, maggi, lays, kurkure, parle-g, bournvita, oreo, dairy milk — use
   their own size word verbatim as the unit (e.g. "grande cappuccino" ->

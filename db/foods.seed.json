@@ -38,7 +38,9 @@
       "chapati",
       "phulka",
       "chapatti",
-      "rotis"
+      "rotis",
+      "flatbread",
+      "wheat flatbread"
     ]
   },
   "paratha": {
@@ -128,7 +130,11 @@
       "toor dal",
       "moong dal",
       "masoor dal",
-      "arhar dal"
+      "arhar dal",
+      "lentil",
+      "lentil soup",
+      "cooked lentils",
+      "yellow lentils"
     ]
   },
   "rajma cooked": {
@@ -145,7 +151,10 @@
     },
     "aliases": [
       "rajma",
-      "kidney beans"
+      "kidney beans",
+      "red kidney beans",
+      "kidney bean curry",
+      "boiled kidney beans"
     ]
   },
   "chole cooked": {
@@ -165,7 +174,16 @@
       "chana",
       "chickpeas",
       "chana masala",
-      "kabuli chana"
+      "kabuli chana",
+      "chickpea",
+      "chickpeas boiled",
+      "boiled chickpeas",
+      "chickpea boiled",
+      "garbanzo",
+      "garbanzo beans",
+      "chickpea curry",
+      "chana boiled",
+      "boiled chana"
     ]
   },
   "chicken breast cooked": {
@@ -250,7 +268,8 @@
     },
     "aliases": [
       "cottage cheese",
-      "paneer cubes"
+      "paneer cubes",
+      "indian cottage cheese"
     ]
   },
   "tofu": {
@@ -280,7 +299,8 @@
     "aliases": [
       "dahi",
       "yogurt",
-      "yoghurt"
+      "yoghurt",
+      "plain yogurt"
     ]
   },
   "greek yogurt": {
@@ -519,7 +539,9 @@
       "plate": 200
     },
     "aliases": [
-      "poha"
+      "poha",
+      "flattened rice",
+      "beaten rice"
     ]
   },
   "idli": {
@@ -533,7 +555,10 @@
     "portions": {
       "piece": 40
     },
-    "aliases": []
+    "aliases": [
+      "rice cake",
+      "steamed rice cake"
+    ]
   },
   "dosa": {
     "per100": {
@@ -563,7 +588,9 @@
       "katori": 150,
       "plate": 200
     },
-    "aliases": []
+    "aliases": [
+      "semolina porridge"
+    ]
   },
   "mixed vegetable sabzi": {
     "per100": {
@@ -596,7 +623,10 @@
       "katori": 150,
       "bowl": 200
     },
-    "aliases": []
+    "aliases": [
+      "spinach and cottage cheese",
+      "spinach cottage cheese"
+    ]
   },
   "salad": {
     "per100": {
@@ -2146,7 +2176,9 @@
     },
     "aliases": [
       "ladi pav",
-      "bun"
+      "bun",
+      "bread roll",
+      "dinner roll"
     ]
   },
   "omelette": {
@@ -2462,7 +2494,9 @@
       "katori": 150,
       "bowl": 200
     },
-    "aliases": []
+    "aliases": [
+      "black lentil curry"
+    ]
   },
   "egg curry": {
     "per100": {
@@ -2490,7 +2524,9 @@
       "bowl": 250
     },
     "aliases": [
-      "khichuri"
+      "khichuri",
+      "rice and lentils",
+      "lentil rice"
     ]
   },
   "curd rice": {
@@ -2506,7 +2542,8 @@
       "bowl": 250
     },
     "aliases": [
-      "dahi rice"
+      "dahi rice",
+      "yogurt rice"
     ]
   },
   "buttermilk": {
@@ -2522,7 +2559,8 @@
     },
     "aliases": [
       "chaas",
-      "chach"
+      "chach",
+      "chaach"
     ]
   },
   "lassi": {
@@ -2537,7 +2575,8 @@
       "glass": 250
     },
     "aliases": [
-      "sweet lassi"
+      "sweet lassi",
+      "yogurt drink"
     ]
   },
   "orange juice": {
@@ -2778,7 +2817,9 @@
       "piece": 80
     },
     "aliases": [
-      "besan cheela"
+      "besan cheela",
+      "chickpea flour pancake",
+      "gram flour pancake"
     ]
   },
   "moong dal chilla": {
@@ -2793,7 +2834,9 @@
       "piece": 70
     },
     "aliases": [
-      "moong dal cheela"
+      "moong dal cheela",
+      "lentil pancake",
+      "mung bean pancake"
     ]
   },
   "sabudana khichdi": {
@@ -2809,7 +2852,9 @@
       "bowl": 200
     },
     "aliases": [
-      "sago khichdi"
+      "sago khichdi",
+      "tapioca pearls",
+      "sago"
     ]
   },
   "vermicelli upma": {
@@ -2825,7 +2870,8 @@
       "plate": 200
     },
     "aliases": [
-      "semiya upma"
+      "semiya upma",
+      "seviyan upma"
     ]
   },
   "aloo paratha": {
@@ -2973,7 +3019,10 @@
     "aliases": [
       "bhindi",
       "okra sabzi",
-      "bhindi fry"
+      "bhindi fry",
+      "okra",
+      "okra curry",
+      "lady finger"
     ]
   },
   "paneer capsicum": {
@@ -3007,7 +3056,9 @@
     "aliases": [
       "kali dal",
       "whole urad dal",
-      "maa ki dal"
+      "maa ki dal",
+      "black lentils",
+      "black gram"
     ]
   },
   "baingan bharta": {
@@ -3023,7 +3074,9 @@
       "bowl": 200
     },
     "aliases": [
-      "baigan bharta"
+      "baigan bharta",
+      "roasted eggplant",
+      "eggplant mash"
     ]
   },
   "jeera aloo": {
@@ -3069,7 +3122,8 @@
       "bowl": 200
     },
     "aliases": [
-      "mutter paneer"
+      "mutter paneer",
+      "peas and cottage cheese"
     ]
   },
   "kadhi pakora": {
@@ -3085,7 +3139,8 @@
       "bowl": 200
     },
     "aliases": [
-      "kadhi"
+      "kadhi",
+      "yogurt curry"
     ]
   },
   "lauki sabzi": {
@@ -3102,7 +3157,9 @@
     },
     "aliases": [
       "bottle gourd sabzi",
-      "ghiya sabzi"
+      "ghiya sabzi",
+      "bottle gourd",
+      "bottle gourd curry"
     ]
   },
   "karela sabzi": {
@@ -3118,7 +3175,9 @@
       "bowl": 200
     },
     "aliases": [
-      "bitter gourd sabzi"
+      "bitter gourd sabzi",
+      "bitter gourd",
+      "bitter melon"
     ]
   },
   "gobi matar": {
@@ -3134,7 +3193,8 @@
       "bowl": 200
     },
     "aliases": [
-      "cauliflower peas sabzi"
+      "cauliflower peas sabzi",
+      "cauliflower peas"
     ]
   },
   "chana dal cooked": {
@@ -3150,7 +3210,10 @@
       "bowl": 200
     },
     "aliases": [
-      "chana dal"
+      "chana dal",
+      "split chickpeas",
+      "bengal gram",
+      "split chickpea"
     ]
   },
   "malai kofta": {
@@ -3227,7 +3290,10 @@
     },
     "aliases": [
       "mutton keema",
-      "keema curry"
+      "keema curry",
+      "minced meat",
+      "ground meat",
+      "minced mutton"
     ]
   },
   "missi roti": {
@@ -3255,7 +3321,9 @@
       "piece": 40,
       "plate": 200
     },
-    "aliases": []
+    "aliases": [
+      "grilled cottage cheese"
+    ]
   },
   "chicken tikka masala": {
     "per100": {
@@ -3282,7 +3350,9 @@
     "portions": {
       "piece": 40
     },
-    "aliases": []
+    "aliases": [
+      "milk dumpling dessert"
+    ]
   },
   "rasgulla": {
     "per100": {
@@ -3342,7 +3412,9 @@
     "aliases": [
       "sooji halwa",
       "rava kesari",
-      "halwa"
+      "halwa",
+      "semolina pudding",
+      "semolina halwa"
     ]
   },
   "besan ladoo": {
@@ -3463,7 +3535,9 @@
     },
     "aliases": [
       "papadum",
-      "roasted papad"
+      "roasted papad",
+      "poppadom",
+      "pappadam"
     ]
   },
   "achaar": {
@@ -3480,7 +3554,8 @@
     },
     "aliases": [
       "pickle",
-      "mango pickle"
+      "mango pickle",
+      "indian pickle"
     ]
   },
   "aloo gobi": {
@@ -3499,7 +3574,8 @@
       "gobhi aaloo",
       "gobi aloo",
       "aloo gobhi",
-      "cauliflower potato sabzi"
+      "cauliflower potato sabzi",
+      "potato cauliflower"
     ]
   },
   "aloo matar": {
@@ -3551,7 +3627,9 @@
     "aliases": [
       "plain palak",
       "spinach sabzi",
-      "saada palak"
+      "saada palak",
+      "spinach curry",
+      "cooked spinach"
     ]
   },
   "tinda sabzi": {
@@ -3704,7 +3782,8 @@
     },
     "aliases": [
       "sarson saag",
-      "mustard greens saag"
+      "mustard greens saag",
+      "mustard greens"
     ]
   },
   "kathal ki sabzi": {
@@ -3806,7 +3885,8 @@
     "aliases": [
       "gol gappa",
       "puchka",
-      "gup chup"
+      "gup chup",
+      "golgappa"
     ]
   },
   "bhel puri": {
@@ -4711,7 +4791,9 @@
     },
     "aliases": [
       "shikanji",
-      "shikarni"
+      "shikarni",
+      "lemonade",
+      "lemon water"
     ]
   },
   "mango lassi": {
