@@ -75,6 +75,30 @@ export async function loadFoods(userId: number): Promise<Food[]> {
 }
 
 /**
+ * Fallback lookup in the USDA catalog (catalog_foods) for names the curated
+ * table doesn't know. Every query word must appear as a whole word (plurals
+ * allowed); the shortest, most-specific name wins, cooked over raw unless the
+ * user said raw.
+ */
+export async function searchCatalog(name: string): Promise<Food | null> {
+  const words = name.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 1).slice(0, 6);
+  if (!words.length) return null;
+  const patterns = words.map((w) => `\\y${w.replace(/s$/, "")}(s|es)?\\y`);
+  const wantsRaw = words.includes("raw");
+  const rows = (await sql`
+    SELECT 0 AS id, key, '{}'::text[] AS aliases, kcal, protein, carbs, fat, fiber, portions
+    FROM catalog_foods
+    WHERE key ~* ALL(${patterns}::text[])
+    ORDER BY (NOT ${wantsRaw} AND key ~ '\\yraw\\y')::int,
+             array_length(string_to_array(key, ' '), 1),
+             CASE source WHEN 'Foundation' THEN 0 WHEN 'SR Legacy' THEN 1 ELSE 2 END,
+             key
+    LIMIT 1
+  `) as Food[];
+  return rows[0] ?? null;
+}
+
+/**
  * Claim a Telegram update id. Returns false if we have already handled it.
  *
  * Telegram re-delivers any update it believes failed, which is precisely how

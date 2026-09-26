@@ -12,7 +12,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseMessage } from "@/lib/parse";
 import {
-  upsertUser, getTargets, loadFoods, claimUpdate, insertEntries,
+  upsertUser, getTargets, loadFoods, searchCatalog, claimUpdate, insertEntries,
   dayTotals, undoEntries, listEntries, deleteEntryAt, deleteLatestByFood, logWeight,
   learnFood, setTargets, setHeight, sql,
 } from "@/lib/db";
@@ -123,7 +123,7 @@ async function handle(
       const problems: string[] = [];
 
       for (const item of intent.items) {
-        const food = findFood(item.name, foods);
+        const food = findFood(item.name, foods) ?? (await searchCatalog(item.name));
         if (!food) {
           problems.push(`${item.name} — not in your food table yet`);
           continue;
