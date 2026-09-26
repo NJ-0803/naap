@@ -24,7 +24,7 @@ import { mintToken } from "@/lib/auth";
 import { estimateFood } from "@/lib/learn";
 import { verifyKcal } from "@/lib/verify";
 import {
-  findFood, toGrams, macrosFor, implausible, localDay, inferMeal,
+  findFood, covers, toGrams, macrosFor, implausible, localDay, inferMeal,
   isMassUnit, ZERO, type PricedItem, type Macros,
 } from "@/lib/ledger";
 import { sendMessage, sendPhoto, renderDay, escapeHtml } from "@/lib/telegram";
@@ -123,7 +123,12 @@ async function handle(
       const problems: string[] = [];
 
       for (const item of intent.items) {
-        const food = findFood(item.name, foods) ?? (await searchCatalog(item.name));
+        // A curated hit that only shares a word ("salad" for "caesar salad") must not
+        // shadow a real match in the USDA catalog; it's kept as the last resort.
+        const curated = findFood(item.name, foods);
+        const food = curated && covers(curated, item.name)
+          ? curated
+          : (await searchCatalog(item.name)) ?? curated;
         if (!food) {
           problems.push(`${item.name} — not in your food table yet`);
           continue;

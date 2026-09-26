@@ -41,7 +41,7 @@ for (const [key, rec] of Object.entries(seed)) {
     VALUES (NULL, ${key}, ${rec.aliases ?? []}, ${p.kcal}, ${p.protein ?? 0},
             ${p.carbs ?? 0}, ${p.fat ?? 0}, ${p.fiber ?? 0},
             ${JSON.stringify(rec.portions ?? {})})
-    ON CONFLICT (owner_user_id, key) DO UPDATE
+    ON CONFLICT (key) WHERE owner_user_id IS NULL DO UPDATE
       SET aliases = EXCLUDED.aliases, kcal = EXCLUDED.kcal,
           protein = EXCLUDED.protein, carbs = EXCLUDED.carbs,
           fat = EXCLUDED.fat, fiber = EXCLUDED.fiber,

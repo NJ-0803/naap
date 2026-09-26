@@ -90,6 +90,22 @@ export function findFood(name: string, foods: Food[]): Food | null {
   return partial.sort((a, b) => a.key.length - b.key.length)[0] ?? null;
 }
 
+/**
+ * Does this food actually name what was said, rather than just sharing a word
+ * with it? True when the food's key contains every word asked for, or one of
+ * its aliases is exactly that phrase. "caesar salad" is NOT covered by the
+ * generic "salad" entry; "chicken breast" IS covered by "chicken breast cooked".
+ */
+export function covers(food: Food, name: string): boolean {
+  const qt = tokens(name.trim().toLowerCase());
+  if (!qt.length) return false;
+  if (qt.every((w) => tokens(food.key.toLowerCase()).includes(w))) return true;
+  return food.aliases.some((a) => {
+    const at = tokens(a.toLowerCase());
+    return at.length === qt.length && at.every((w, i) => w === qt[i]);
+  });
+}
+
 function tokens(s: string): string[] {
   return s.split(/[^a-z0-9]+/).filter(Boolean).map((w) => (w.length > 3 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w));
 }

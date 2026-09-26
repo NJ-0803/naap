@@ -83,13 +83,18 @@ export async function loadFoods(userId: number): Promise<Food[]> {
 export async function searchCatalog(name: string): Promise<Food | null> {
   const words = name.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 1).slice(0, 6);
   if (!words.length) return null;
+  const junk = ["dressing", "sauce", "seasoning", "substitute", "meatless", "imitation", "analog", "powder", "baby"]
+    .filter((j) => !words.includes(j));
+  const junkRe = junk.length ? `\\y(${junk.join("|")})\\y` : "^$";
   const patterns = words.map((w) => `\\y${w.replace(/s$/, "")}(s|es)?\\y`);
   const wantsRaw = words.includes("raw");
   const rows = (await sql`
     SELECT 0 AS id, key, '{}'::text[] AS aliases, kcal, protein, carbs, fat, fiber, portions
     FROM catalog_foods
     WHERE key ~* ALL(${patterns}::text[])
-    ORDER BY (NOT ${wantsRaw} AND key ~ '\\yraw\\y')::int,
+    ORDER BY (regexp_replace(key, '(no|without) (salad )?dressing', '') ~ ${junkRe})::int,
+             (NOT ${wantsRaw} AND key ~ '\\yraw\\y')::int,
+             (NOT split_part(key, ' ', 1) = ANY(${words}::text[]))::int,
              array_length(string_to_array(key, ' '), 1),
              CASE source WHEN 'Foundation' THEN 0 WHEN 'SR Legacy' THEN 1 ELSE 2 END,
              key

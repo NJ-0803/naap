@@ -88,6 +88,13 @@ function portionsOf(f) {
     const amt = Number(p.amount) > 0 ? Number(p.amount) : 1;
     if (!(UNITS[w] in out)) out[UNITS[w]] = Math.round((g / amt) * 10) / 10;
   }
+  // Survey (FNDDS) dishes list their natural serving first ("1 cheeseburger",
+  // "1 burrito") under names the whitelist can't know — use it as the piece.
+  if (f.dataType?.startsWith("Survey") && !out.piece && !out.serving) {
+    const p = (f.foodPortions ?? []).find((x) => Number(x.gramWeight) > 0 &&
+      !/cup|tablespoon|teaspoon|fl oz|ounce|quantity not specified/i.test(`${x.measureUnit?.name} ${x.modifier} ${x.portionDescription}`));
+    if (p) out.piece = Math.round((Number(p.gramWeight) / (Number(p.amount) > 0 ? Number(p.amount) : 1)) * 10) / 10;
+  }
   return out;
 }
 
